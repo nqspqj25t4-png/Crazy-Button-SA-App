@@ -8,7 +8,7 @@ import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { addDoc, collection, doc, onSnapshot, orderBy, query, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
-import { STANDARD_LABELS, DEFAULT_CATEGORIES } from '@/src/constants/products';
+import { AUDIENCE_PERSONAS, BRAND_STORY, DEFAULT_CATEGORIES, PATCH_DROP, PRODUCT_TEMPLATES, STANDARD_LABELS, TAGLINE_OPTIONS } from '@/src/constants/products';
 import { Colors, Fonts } from '@/constants/theme';
 import { useAuth } from '@/src/context/AuthContext';
 import { auth, db, storage } from '@/src/firebase';
@@ -198,6 +198,66 @@ export default function AdminScreen() {
     });
   };
 
+  const loadTemplate = (template) => {
+    setForm({
+      ...initialForm,
+      title: template.title ?? '',
+      subtitle: template.subtitle ?? '',
+      description: template.description ?? '',
+      category: template.category ?? initialForm.category,
+      labels: template.labels ?? initialForm.labels,
+      priceZAR: template.priceZAR?.toString() ?? '',
+      priceEUR: template.priceEUR?.toString() ?? '',
+      tagsText: template.tags?.join(', ') ?? '',
+      webUrl: template.webUrl ?? initialForm.webUrl,
+      status: template.status ?? initialForm.status,
+    });
+  };
+
+  const publishTemplate = async (template) => {
+    try {
+      setSaving(true);
+      const payload = {
+        title: template.title,
+        subtitle: template.subtitle,
+        description: template.description,
+        category: template.category ?? DEFAULT_CATEGORIES[0],
+        tags: template.tags ?? [],
+        labels: template.labels ?? ['New'],
+        priceZAR: Number(template.priceZAR) || 0,
+        priceEUR: Number(template.priceEUR) || 0,
+        compareAtPriceZAR: null,
+        compareAtPriceEUR: null,
+        sku: template.id?.toUpperCase(),
+        barcode: '',
+        stock: 10,
+        weight: null,
+        dimensions: { length: null, width: null, height: null },
+        materials: '',
+        careInstructions: '',
+        fitNotes: '',
+        sizeGuideUrl: '',
+        webUrl: template.webUrl ?? initialForm.webUrl,
+        status: template.status ?? 'draft',
+        images: [],
+        updatedAt: serverTimestamp(),
+        updatedBy: user?.email ?? 'admin',
+      };
+
+      await addDoc(collection(db, 'products'), {
+        ...payload,
+        createdAt: serverTimestamp(),
+        createdBy: user?.email ?? 'admin',
+      });
+
+      Alert.alert('Template published', `${template.title} added to products.`);
+    } catch (error) {
+      Alert.alert('Publish failed', error.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const wrapWithBackground = (child) => (
     <ImageBackground source={BACKGROUND_IMAGE} style={styles.background} imageStyle={styles.backgroundImage}>
       <View style={styles.overlay}>{child}</View>
@@ -264,6 +324,63 @@ export default function AdminScreen() {
       />
 
       <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.brandCard}>
+          <Text style={styles.brandTagline}>{BRAND_STORY.tagline}</Text>
+          <Text style={styles.brandVoice}>{BRAND_STORY.voice}</Text>
+          <Text style={styles.brandUSP}>{BRAND_STORY.usp}</Text>
+          <Text style={styles.brandPalette}>{BRAND_STORY.palette}</Text>
+          <Text style={styles.brandContact}>Owner: {BRAND_STORY.contact.owner}</Text>
+          <Text style={styles.brandContact}>Phone: {BRAND_STORY.contact.phone}</Text>
+          <Text style={styles.brandContact}>Email: {BRAND_STORY.contact.email}</Text>
+          <Text style={styles.brandLink}>{BRAND_STORY.contact.instagram.replace('https://', '')}</Text>
+        </View>
+
+        <Text style={styles.sectionTitle}>Tagline Options</Text>
+        <View style={styles.chipRow}>
+          {TAGLINE_OPTIONS.map((line) => (
+            <View key={line} style={styles.taglineChip}>
+              <Text style={styles.taglineText}>{line}</Text>
+            </View>
+          ))}
+        </View>
+
+        <Text style={styles.sectionTitle}>Audience Personas</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.personaRow}>
+          {AUDIENCE_PERSONAS.map((persona) => (
+            <View key={persona.name} style={styles.personaCard}>
+              <Text style={styles.personaTitle}>{persona.name}</Text>
+              <Text style={styles.personaDescription}>{persona.description}</Text>
+            </View>
+          ))}
+        </ScrollView>
+
+        <Text style={styles.sectionTitle}>Patch Drop Vol. 1</Text>
+        <View style={styles.patchList}>
+          {PATCH_DROP.map((patch) => (
+            <View key={patch.title} style={styles.patchCard}>
+              <Text style={styles.patchTitle}>{patch.title}</Text>
+              <Text style={styles.patchDescription}>{patch.description}</Text>
+            </View>
+          ))}
+        </View>
+
+        <Text style={styles.sectionTitle}>Product Templates</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.templateRow}>
+          {PRODUCT_TEMPLATES.map((template) => (
+            <View key={template.id} style={styles.templateCard}>
+              <Text style={styles.templateTitle}>{template.title}</Text>
+              <Text style={styles.templateSubtitle}>{template.subtitle}</Text>
+              <Text style={styles.templateMeta}>{template.category} • ZAR {template.priceZAR}</Text>
+              <TouchableOpacity style={styles.templateButton} onPress={() => loadTemplate(template)}>
+                <Text style={styles.templateButtonText}>Load Template</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.templateButtonSecondary} onPress={() => publishTemplate(template)}>
+                <Text style={styles.templateButtonSecondaryText}>Publish Template</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
+
         <Text style={styles.sectionTitle}>Product Details</Text>
         <TextInput placeholder="Title" value={form.title} onChangeText={(text) => setForm((prev) => ({ ...prev, title: text }))} style={styles.input} />
         <TextInput placeholder="Subtitle" value={form.subtitle} onChangeText={(text) => setForm((prev) => ({ ...prev, subtitle: text }))} style={styles.input} />
@@ -355,6 +472,13 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   authContainer: { flex: 1, justifyContent: 'center', padding: 24, gap: 12, backgroundColor: Colors.light.background },
   container: { padding: 16, gap: 12, backgroundColor: Colors.light.background },
+  brandCard: { padding: 16, borderRadius: 18, backgroundColor: '#ffffffcc', borderWidth: 1, borderColor: Colors.light.border, gap: 4 },
+  brandTagline: { fontSize: 22, fontFamily: Fonts.sans, color: Colors.light.tint },
+  brandVoice: { fontFamily: Fonts.body, color: Colors.light.text },
+  brandUSP: { fontFamily: Fonts.sans, color: Colors.light.accentGreen },
+  brandPalette: { fontFamily: Fonts.body, color: Colors.light.text },
+  brandContact: { fontFamily: Fonts.body, color: Colors.light.icon },
+  brandLink: { fontFamily: Fonts.sans, color: Colors.light.accentRed, textDecorationLine: 'underline' },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 12 },
   sectionTitle: { fontSize: 18, fontFamily: Fonts.sans, color: Colors.light.text, marginHorizontal: 16, marginTop: 16 },
   h: { fontSize: 20, fontFamily: Fonts.sans, color: Colors.light.text },
@@ -364,6 +488,25 @@ const styles = StyleSheet.create({
   flexGrow: { flex: 1 },
   label: { fontWeight: '600', marginTop: 6, color: Colors.light.text, fontFamily: Fonts.sans },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  taglineChip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: Colors.light.card, borderWidth: 1, borderColor: Colors.light.border },
+  taglineText: { fontFamily: Fonts.body, color: Colors.light.text },
+  personaRow: { gap: 12, paddingVertical: 8 },
+  personaCard: { width: 240, padding: 16, borderRadius: 14, backgroundColor: '#ffffffdd', borderWidth: 1, borderColor: Colors.light.border },
+  personaTitle: { fontFamily: Fonts.sans, color: Colors.light.tint, marginBottom: 6 },
+  personaDescription: { fontFamily: Fonts.body, color: Colors.light.text },
+  patchList: { gap: 10 },
+  patchCard: { padding: 12, borderRadius: 12, backgroundColor: '#fff', borderWidth: 1, borderColor: Colors.light.border },
+  patchTitle: { fontFamily: Fonts.sans, color: Colors.light.accentGreen },
+  patchDescription: { fontFamily: Fonts.body, color: Colors.light.text },
+  templateRow: { gap: 12, paddingVertical: 8 },
+  templateCard: { width: 260, padding: 16, borderRadius: 16, backgroundColor: '#ffffffee', borderWidth: 1, borderColor: Colors.light.border, gap: 6 },
+  templateTitle: { fontFamily: Fonts.sans, color: Colors.light.text },
+  templateSubtitle: { fontFamily: Fonts.body, color: Colors.light.icon },
+  templateMeta: { fontFamily: Fonts.body, color: Colors.light.accentYellow },
+  templateButton: { marginTop: 4, backgroundColor: Colors.light.tint, paddingVertical: 8, borderRadius: 999 },
+  templateButtonText: { color: '#fff', textAlign: 'center', fontFamily: Fonts.sans },
+  templateButtonSecondary: { marginTop: 6, backgroundColor: Colors.light.card, paddingVertical: 8, borderRadius: 999, borderWidth: 1, borderColor: Colors.light.tint },
+  templateButtonSecondaryText: { color: Colors.light.tint, textAlign: 'center', fontFamily: Fonts.sans },
   chip: { borderWidth: 1, borderColor: Colors.light.border, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: Colors.light.card },
   chipActive: { backgroundColor: Colors.light.tint, borderColor: Colors.light.tint },
   chipText: { color: Colors.light.text, fontFamily: Fonts.body },

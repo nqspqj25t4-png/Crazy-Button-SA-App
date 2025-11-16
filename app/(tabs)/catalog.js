@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { FlatList, Image, ImageBackground, Linking, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 
-import { STANDARD_LABELS } from '@/src/constants/products';
+import { AUDIENCE_PERSONAS, BRAND_STORY, PATCH_DROP, STANDARD_LABELS, TAGLINE_OPTIONS } from '@/src/constants/products';
 import { db } from '@/src/firebase';
 import { Colors, Fonts } from '@/constants/theme';
 
@@ -47,6 +47,37 @@ export default function CatalogScreen() {
 
   const body = (
     <View style={styles.inner}>
+      <View style={styles.brandCard}>
+        <Text style={styles.brandTagline}>{BRAND_STORY.tagline}</Text>
+        <Text style={styles.brandVoice}>{BRAND_STORY.voice}</Text>
+        <Text style={styles.brandUSP}>{BRAND_STORY.usp}</Text>
+        <TouchableOpacity onPress={() => openLink(BRAND_STORY.contact.instagram)}>
+          <Text style={styles.brandLink}>{BRAND_STORY.contact.instagram.replace('https://', '')}</Text>
+        </TouchableOpacity>
+      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.taglineRow}>
+        {TAGLINE_OPTIONS.map((line) => (
+          <View key={line} style={styles.taglineChip}>
+            <Text style={styles.taglineText}>{line}</Text>
+          </View>
+        ))}
+      </ScrollView>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.personaRow}>
+        {AUDIENCE_PERSONAS.map((persona) => (
+          <View key={persona.name} style={styles.personaCard}>
+            <Text style={styles.personaTitle}>{persona.name}</Text>
+            <Text style={styles.personaDescription}>{persona.description}</Text>
+          </View>
+        ))}
+      </ScrollView>
+      <View style={styles.patchList}>
+        {PATCH_DROP.map((patch) => (
+          <View key={patch.title} style={styles.patchCard}>
+            <Text style={styles.patchTitle}>{patch.title}</Text>
+            <Text style={styles.patchDescription}>{patch.description}</Text>
+          </View>
+        ))}
+      </View>
       <View style={styles.controls}>
         <TextInput
           placeholder="Search products"
@@ -114,6 +145,22 @@ const styles = StyleSheet.create({
   backgroundImage: { opacity: 0.05, resizeMode: 'contain' },
   overlay: { flex: 1, backgroundColor: 'rgba(247,247,247,0.94)' },
   inner: { flex: 1, padding: 16 },
+  brandCard: { backgroundColor: '#ffffffcc', borderRadius: 16, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: Colors.light.border },
+  brandTagline: { fontSize: 20, fontFamily: Fonts.sans, color: Colors.light.tint },
+  brandVoice: { marginTop: 4, color: Colors.light.text, fontFamily: Fonts.body },
+  brandUSP: { marginTop: 6, color: Colors.light.accentGreen, fontFamily: Fonts.sans },
+  brandLink: { marginTop: 8, color: Colors.light.accentRed, fontFamily: Fonts.sans, textDecorationLine: 'underline' },
+  taglineRow: { gap: 10, marginBottom: 12 },
+  taglineChip: { backgroundColor: Colors.light.card, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: Colors.light.border },
+  taglineText: { fontFamily: Fonts.body, color: Colors.light.text },
+  personaRow: { gap: 12, marginBottom: 12 },
+  personaCard: { width: 220, padding: 14, borderRadius: 14, backgroundColor: '#ffffffdd', borderWidth: 1, borderColor: Colors.light.border },
+  personaTitle: { fontFamily: Fonts.sans, color: Colors.light.tint, marginBottom: 4 },
+  personaDescription: { fontFamily: Fonts.body, color: Colors.light.text },
+  patchList: { gap: 8, marginBottom: 16 },
+  patchCard: { padding: 12, borderRadius: 12, backgroundColor: '#fff', borderWidth: 1, borderColor: Colors.light.border },
+  patchTitle: { fontFamily: Fonts.sans, color: Colors.light.accentGreen },
+  patchDescription: { fontFamily: Fonts.body, color: Colors.light.text },
   controls: { marginBottom: 12, gap: 8 },
   search: { borderWidth: 1, borderColor: Colors.light.border, borderRadius: 12, padding: 12, backgroundColor: Colors.light.card, fontFamily: Fonts.body },
   currencyRow: { flexDirection: 'row', gap: 8 },
