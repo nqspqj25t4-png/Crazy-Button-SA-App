@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, Image, Linking, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, ImageBackground, Linking, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 
 import { STANDARD_LABELS } from '@/src/constants/products';
@@ -7,6 +7,7 @@ import { db } from '@/src/firebase';
 import { Colors, Fonts } from '@/constants/theme';
 
 const currencies = ['ZAR', 'EUR'];
+const BACKGROUND_IMAGE = require('../../assets/images/crazy-button-logo.png');
 
 export default function CatalogScreen() {
   const [products, setProducts] = useState([]);
@@ -44,8 +45,8 @@ export default function CatalogScreen() {
     Linking.openURL(url).catch(() => {});
   };
 
-  return (
-    <View style={styles.container}>
+  const body = (
+    <View style={styles.inner}>
       <View style={styles.controls}>
         <TextInput
           placeholder="Search products"
@@ -100,10 +101,19 @@ export default function CatalogScreen() {
       />
     </View>
   );
+
+  return (
+    <ImageBackground source={BACKGROUND_IMAGE} style={styles.container} imageStyle={styles.backgroundImage}>
+      <View style={styles.overlay}>{body}</View>
+    </ImageBackground>
+  );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.light.background, padding: 16 },
+  container: { flex: 1 },
+  backgroundImage: { opacity: 0.05, resizeMode: 'contain' },
+  overlay: { flex: 1, backgroundColor: 'rgba(247,247,247,0.94)' },
+  inner: { flex: 1, padding: 16 },
   controls: { marginBottom: 12, gap: 8 },
   search: { borderWidth: 1, borderColor: Colors.light.border, borderRadius: 12, padding: 12, backgroundColor: Colors.light.card, fontFamily: Fonts.body },
   currencyRow: { flexDirection: 'row', gap: 8 },

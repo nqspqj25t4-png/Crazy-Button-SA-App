@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Button, FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Button, FlatList, Image, ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
 import * as Crypto from 'expo-crypto';
@@ -12,6 +12,8 @@ import { STANDARD_LABELS, DEFAULT_CATEGORIES } from '@/src/constants/products';
 import { Colors, Fonts } from '@/constants/theme';
 import { useAuth } from '@/src/context/AuthContext';
 import { auth, db, storage } from '@/src/firebase';
+
+const BACKGROUND_IMAGE = require('../../assets/images/crazy-button-logo.png');
 
 const initialForm = {
   id: null,
@@ -196,16 +198,22 @@ export default function AdminScreen() {
     });
   };
 
+  const wrapWithBackground = (child) => (
+    <ImageBackground source={BACKGROUND_IMAGE} style={styles.background} imageStyle={styles.backgroundImage}>
+      <View style={styles.overlay}>{child}</View>
+    </ImageBackground>
+  );
+
   if (loading) {
-    return (
+    return wrapWithBackground(
       <View style={styles.center}>
         <Text>Checking admin access…</Text>
-      </View>
+      </View>,
     );
   }
 
   if (!user) {
-    return (
+    return wrapWithBackground(
       <View style={styles.authContainer}>
         <Text style={styles.h}>Admin Sign In</Text>
         <TextInput
@@ -224,11 +232,11 @@ export default function AdminScreen() {
           style={styles.input}
         />
         <Button title="Sign In" onPress={handleAuth} />
-      </View>
+      </View>,
     );
   }
 
-  return (
+  return wrapWithBackground(
     <View style={styles.flex}>
       <View style={styles.headerRow}>
         <Text style={styles.h}>Welcome, {user.email}</Text>
@@ -335,11 +343,14 @@ export default function AdminScreen() {
           <Button title={form.id ? 'Update Product' : 'Create Product'} onPress={handleSave} disabled={saving} />
         </View>
       </ScrollView>
-    </View>
+    </View>,
   );
 }
 
 const styles = StyleSheet.create({
+  background: { flex: 1 },
+  backgroundImage: { opacity: 0.05, resizeMode: 'contain' },
+  overlay: { flex: 1, backgroundColor: 'rgba(247,247,247,0.94)' },
   flex: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   authContainer: { flex: 1, justifyContent: 'center', padding: 24, gap: 12, backgroundColor: Colors.light.background },
