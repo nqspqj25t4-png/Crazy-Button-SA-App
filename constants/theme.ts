@@ -1,63 +1,66 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Crazy Button SA — brand tokens (from the company style guide).
+ * Base: off-black, bone, concrete. Accents: flag red, deep green, gold, vapour blue.
  */
-
 import { Platform } from 'react-native';
 
-const brandNavy = '#1B2D7A';
-const brandRed = '#E3312D';
-const brandGreen = '#137A3C';
-const brandYellow = '#F7B733';
-const neutralDark = '#0F1115';
-const neutralLight = '#F7F7F7';
+export const Brand = {
+  ink: '#121212',
+  bone: '#EDE8DF',
+  studio: '#E8E2D8',
+  tile: '#E2DCD1',
+  concrete: '#CFCAC1',
+  washed: '#8C8A85',
+  smoke: '#5E5B57',
+  red: '#C8322B',
+  green: '#0F5A36',
+  gold: '#F2B33D',
+  blue: '#1B2D7A',
+  vapour: '#9FC3D9',
+  white: '#FFFFFF',
+};
 
 export const Colors = {
   light: {
-    text: neutralDark,
-    background: neutralLight,
-    card: '#FFFFFF',
-    border: '#E5E7EB',
-    tint: brandNavy,
-    accentRed: brandRed,
-    accentGreen: brandGreen,
-    accentYellow: brandYellow,
-    icon: '#5F6570',
-    tabIconDefault: '#94A3B8',
-    tabIconSelected: brandNavy,
+    text: Brand.ink,
+    background: Brand.bone,
+    card: Brand.tile,
+    border: Brand.concrete,
+    tint: Brand.ink,
+    accentRed: Brand.red,
+    accentGreen: Brand.green,
+    accentYellow: Brand.gold,
+    icon: Brand.smoke,
+    tabIconDefault: Brand.washed,
+    tabIconSelected: Brand.red,
   },
   dark: {
-    text: '#F3F4F6',
-    background: '#070B17',
-    card: '#0F172A',
-    border: '#1F2937',
-    tint: brandYellow,
-    accentRed: brandRed,
-    accentGreen: brandGreen,
-    accentYellow: brandYellow,
-    icon: '#CBD5F5',
-    tabIconDefault: '#475569',
-    tabIconSelected: brandYellow,
+    text: Brand.bone,
+    background: Brand.ink,
+    card: '#1C1C1C',
+    border: '#2E2C2A',
+    tint: Brand.gold,
+    accentRed: Brand.red,
+    accentGreen: Brand.green,
+    accentYellow: Brand.gold,
+    icon: Brand.concrete,
+    tabIconDefault: Brand.washed,
+    tabIconSelected: Brand.gold,
   },
 };
 
+/** Display = condensed bold (Anton); Mono = captions/specs (Space Mono); Body = Source Sans 3. */
+export const Type = {
+  display: 'Anton_400Regular',
+  mono: 'SpaceMono_400Regular',
+  monoBold: 'SpaceMono_700Bold',
+  body: 'SourceSans3_400Regular',
+  bodySemi: 'SourceSans3_600SemiBold',
+  bodyBold: 'SourceSans3_700Bold',
+};
+
+// Kept for older screens that still import Fonts.
 export const Fonts = Platform.select({
-  ios: {
-    sans: 'Montserrat_600SemiBold',
-    body: 'SourceSansPro_400Regular',
-    rounded: 'SFProRounded-Semibold',
-    mono: 'SFMono-Regular',
-  },
-  default: {
-    sans: 'Montserrat_600SemiBold',
-    body: 'SourceSansPro_400Regular',
-    rounded: 'system-ui',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "'Montserrat', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif",
-    body: "'Source Sans Pro', 'Segoe UI', system-ui, sans-serif",
-    rounded: "'Nunito', 'SF Pro Rounded', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+  default: { sans: Type.display, body: Type.body, rounded: Type.bodySemi, mono: Type.mono },
+  web: { sans: Type.display, body: Type.body, rounded: Type.bodySemi, mono: Type.mono },
+})!;

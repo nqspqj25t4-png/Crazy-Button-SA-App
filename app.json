@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "CrazyButtonSA",
+    "name": "Crazy Button SA",
     "slug": "CrazyButtonSA",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/crazy-button-logo.png",
     "scheme": "crazybuttonsa",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
@@ -21,20 +21,23 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "output": "single",
+      "favicon": "./assets/images/crazy-button-logo.png",
+      "name": "Crazy Button SA \u2014 Wear Loud. Walk Proud.",
+      "themeColor": "#121212",
+      "backgroundColor": "#EDE8DF"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
+          "image": "./assets/images/crazy-button-logo.png",
+          "imageWidth": 180,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#121212",
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#121212"
           }
         }
       ]

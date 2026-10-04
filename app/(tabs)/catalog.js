@@ -1,188 +1,112 @@
+import { useLocalSearchParams } from 'expo-router';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, Image, ImageBackground, Linking, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import { FlatList, Pressable, ScrollView, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AUDIENCE_PERSONAS, BRAND_STORY, PATCH_DROP, STANDARD_LABELS, TAGLINE_OPTIONS } from '@/src/constants/products';
+import { Brand, Type } from '@/constants/theme';
+import { CATALOG, CATEGORIES } from '@/src/constants/catalog';
+import { useBag } from '@/src/context/BagContext';
+import { Chip, Display, Eyebrow, ProductCard } from '@/src/components/ui';
 import { db } from '@/src/firebase';
-import { Colors, Fonts } from '@/constants/theme';
+import { rememberRemote } from '@/src/lib/remoteProducts';
 
-const currencies = ['ZAR', 'EUR'];
-const BACKGROUND_IMAGE = require('../../assets/images/crazy-button-logo.png');
+// Firestore product -> app product shape
+const fromFirestore = (d) => ({
+  id: `fs-${d.id}`,
+  title: d.title ?? 'Untitled',
+  collection: d.collection ?? d.category ?? 'Core Range',
+  category: CATEGORIES.includes(d.category) ? d.category : 'Tees',
+  subtitle: d.subtitle ?? '',
+  description: d.description ?? '',
+  image: d.images?.[0]?.url ? { uri: d.images[0].url } : require('@/assets/images/crazy-button-logo.png'),
+  priceZAR: d.priceZAR || null,
+  priceEUR: d.priceEUR || null,
+  badge: d.labels?.includes('New') ? 'New' : undefined,
+  sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+});
 
-export default function CatalogScreen() {
-  const [products, setProducts] = useState([]);
-  const [currency, setCurrency] = useState('ZAR');
+export default function ShopScreen() {
+  const params = useLocalSearchParams();
+  const { width } = useWindowDimensions();
+  const { currency, setCurrency } = useBag();
+  const [remote, setRemote] = useState([]);
   const [search, setSearch] = useState('');
-  const [labelFilter, setLabelFilter] = useState(null);
+  const [cat, setCat] = useState(typeof params.category === 'string' ? params.category : 'All');
+
+  useEffect(() => { if (typeof params.category === 'string') setCat(params.category); }, [params.category]);
 
   useEffect(() => {
-    const q = query(collection(db, 'products'), where('status', '==', 'published'), orderBy('updatedAt', 'desc'));
-    const unsub = onSnapshot(q, (snap) => {
-      setProducts(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
-    return unsub;
+    try {
+      const q = query(collection(db, 'products'), where('status', '==', 'published'));
+      return onSnapshot(q, (snap) => {
+        const list = snap.docs.map((d) => fromFirestore({ id: d.id, ...d.data() }));
+        list.forEach(rememberRemote);
+        setRemote(list);
+      }, () => setRemote([]));
+    } catch {
+      return undefined;
+    }
   }, []);
 
-  const filtered = useMemo(() => {
-    return products.filter((product) => {
-      const matchesSearch = product.title?.toLowerCase().includes(search.toLowerCase()) ?? true;
-      const matchesLabel = labelFilter ? product.labels?.includes(labelFilter) : true;
-      return matchesSearch && matchesLabel;
-    });
-  }, [products, search, labelFilter]);
+  const all = useMemo(() => [...remote, ...CATALOG], [remote]);
+  const visible = useMemo(() => all.filter((p) => (cat === 'All' || p.category === cat) && p.title.toLowerCase().includes(search.trim().toLowerCase())), [all, cat, search]);
+  const count = (c) => (c === 'All' ? all.length : all.filter((p) => p.category === c).length);
 
-  const formatPrice = (product) => {
-    const value = currency === 'EUR' ? product.priceEUR : product.priceZAR;
-    const compare = currency === 'EUR' ? product.compareAtPriceEUR : product.compareAtPriceZAR;
-    if (value == null) return 'Coming soon';
-    const formatted = `${currency} ${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    const compareText = compare ? `  •  ${currency} ${Number(compare).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '';
-    return formatted + compareText;
-  };
-
-  const openLink = (url) => {
-    if (!url) return;
-    Linking.openURL(url).catch(() => {});
-  };
-
-  const body = (
-    <View style={styles.inner}>
-      <View style={styles.brandCard}>
-        <Text style={styles.brandTagline}>{BRAND_STORY.tagline}</Text>
-        <Text style={styles.brandVoice}>{BRAND_STORY.voice}</Text>
-        <Text style={styles.brandUSP}>{BRAND_STORY.usp}</Text>
-        <TouchableOpacity onPress={() => openLink(BRAND_STORY.contact.instagram)}>
-          <Text style={styles.brandLink}>{BRAND_STORY.contact.instagram.replace('https://', '')}</Text>
-        </TouchableOpacity>
-      </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.taglineRow}>
-        {TAGLINE_OPTIONS.map((line) => (
-          <View key={line} style={styles.taglineChip}>
-            <Text style={styles.taglineText}>{line}</Text>
-          </View>
-        ))}
-      </ScrollView>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.personaRow}>
-        {AUDIENCE_PERSONAS.map((persona) => (
-          <View key={persona.name} style={styles.personaCard}>
-            <Text style={styles.personaTitle}>{persona.name}</Text>
-            <Text style={styles.personaDescription}>{persona.description}</Text>
-          </View>
-        ))}
-      </ScrollView>
-      <View style={styles.patchList}>
-        {PATCH_DROP.map((patch) => (
-          <View key={patch.title} style={styles.patchCard}>
-            <Text style={styles.patchTitle}>{patch.title}</Text>
-            <Text style={styles.patchDescription}>{patch.description}</Text>
-          </View>
-        ))}
-      </View>
-      <View style={styles.controls}>
-        <TextInput
-          placeholder="Search products"
-          value={search}
-          onChangeText={setSearch}
-          style={styles.search}
-        />
-        <View style={styles.currencyRow}>
-          {currencies.map((c) => (
-            <TouchableOpacity key={c} style={[styles.currencyChip, currency === c && styles.currencyChipActive]} onPress={() => setCurrency(c)}>
-              <Text style={[styles.currencyChipText, currency === c && styles.currencyChipTextActive]}>{c}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      <View style={styles.filterRow}>
-        <TouchableOpacity style={[styles.filterChip, !labelFilter && styles.filterChipActive]} onPress={() => setLabelFilter(null)}>
-          <Text style={[styles.filterChipText, !labelFilter && styles.filterChipTextActive]}>All labels</Text>
-        </TouchableOpacity>
-        {STANDARD_LABELS.map((label) => (
-          <TouchableOpacity key={label} style={[styles.filterChip, labelFilter === label && styles.filterChipActive]} onPress={() => setLabelFilter(label)}>
-            <Text style={[styles.filterChipText, labelFilter === label && styles.filterChipTextActive]}>{label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <FlatList
-        data={filtered}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={filtered.length === 0 && styles.empty}
-        ListEmptyComponent={<Text style={styles.emptyText}>No products yet.</Text>}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={() => openLink(item.webUrl)}>
-            {item.images?.[0]?.url ? (
-              <Image source={{ uri: item.images[0].url }} style={styles.image} />
-            ) : (
-              <View style={[styles.image, styles.imagePlaceholder]} />
-            )}
-            <View style={styles.cardBody}>
-              <Text style={styles.title}>{item.title}</Text>
-              {item.subtitle ? <Text style={styles.subtitle}>{item.subtitle}</Text> : null}
-              <Text style={styles.price}>{formatPrice(item)}</Text>
-              <View style={styles.labelsRow}>
-                {item.labels?.map((label) => (
-                  <View key={label} style={styles.label}><Text style={styles.labelText}>{label}</Text></View>
-                ))}
-              </View>
-            </View>
-          </TouchableOpacity>
-        )}
-      />
-    </View>
-  );
+  const pad = width >= 900 ? 40 : 20;
+  const cols = width >= 1100 ? 4 : width >= 700 ? 3 : 2;
+  const cardW = (Math.min(width, 1360) - pad * 2 - 14 * (cols - 1)) / cols;
 
   return (
-    <ImageBackground source={BACKGROUND_IMAGE} style={styles.container} imageStyle={styles.backgroundImage}>
-      <View style={styles.overlay}>{body}</View>
-    </ImageBackground>
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Brand.ink }}>
+      <View style={[styles.header, { paddingHorizontal: pad }]}>
+        <View style={styles.rowBetween}>
+          <View>
+            <Eyebrow color={Brand.vapour}>Shop · {visible.length} {visible.length === 1 ? 'piece' : 'pieces'}</Eyebrow>
+            <Display size={width >= 900 ? 80 : 52} color={Brand.bone}>{cat === 'All' ? 'Shop all' : cat}</Display>
+          </View>
+          <View style={styles.currency} accessibilityRole="radiogroup" accessibilityLabel="Currency">
+            {['ZAR', 'EUR'].map((c) => (
+              <Pressable key={c} onPress={() => setCurrency(c)} accessibilityRole="radio" accessibilityState={{ checked: currency === c }} style={[styles.curBtn, currency === c && { backgroundColor: Brand.bone }]}>
+                <Text style={[styles.curText, currency === c && { color: Brand.ink }]}>{c}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+        <TextInput placeholder="Search the drop" placeholderTextColor={Brand.washed} value={search} onChangeText={setSearch} style={styles.search} accessibilityLabel="Search products" />
+      </View>
+      <View style={{ backgroundColor: Brand.bone, borderBottomWidth: 1, borderColor: Brand.concrete }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: pad, paddingVertical: 12 }}>
+          {['All', ...CATEGORIES].map((c) => <Chip key={c} label={`${c} · ${count(c)}`} active={cat === c} onPress={() => setCat(c)} />)}
+        </ScrollView>
+      </View>
+      <FlatList
+        key={cols}
+        style={{ backgroundColor: Brand.bone }}
+        data={visible}
+        keyExtractor={(p) => p.id}
+        numColumns={cols}
+        columnWrapperStyle={{ gap: 14 }}
+        contentContainerStyle={{ padding: pad, gap: 28, paddingBottom: 60 }}
+        renderItem={({ item }) => <ProductCard p={item} currency={currency} width={cardW} />}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Display size={30}>Something heavy is coming</Display>
+            <Text style={styles.emptyText}>Nothing here yet. Join the list to cop first.</Text>
+          </View>
+        }
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  backgroundImage: { opacity: 0.05, resizeMode: 'contain' },
-  overlay: { flex: 1, backgroundColor: 'rgba(247,247,247,0.94)' },
-  inner: { flex: 1, padding: 16 },
-  brandCard: { backgroundColor: '#ffffffcc', borderRadius: 16, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: Colors.light.border },
-  brandTagline: { fontSize: 20, fontFamily: Fonts.sans, color: Colors.light.tint },
-  brandVoice: { marginTop: 4, color: Colors.light.text, fontFamily: Fonts.body },
-  brandUSP: { marginTop: 6, color: Colors.light.accentGreen, fontFamily: Fonts.sans },
-  brandLink: { marginTop: 8, color: Colors.light.accentRed, fontFamily: Fonts.sans, textDecorationLine: 'underline' },
-  taglineRow: { gap: 10, marginBottom: 12 },
-  taglineChip: { backgroundColor: Colors.light.card, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: Colors.light.border },
-  taglineText: { fontFamily: Fonts.body, color: Colors.light.text },
-  personaRow: { gap: 12, marginBottom: 12 },
-  personaCard: { width: 220, padding: 14, borderRadius: 14, backgroundColor: '#ffffffdd', borderWidth: 1, borderColor: Colors.light.border },
-  personaTitle: { fontFamily: Fonts.sans, color: Colors.light.tint, marginBottom: 4 },
-  personaDescription: { fontFamily: Fonts.body, color: Colors.light.text },
-  patchList: { gap: 8, marginBottom: 16 },
-  patchCard: { padding: 12, borderRadius: 12, backgroundColor: '#fff', borderWidth: 1, borderColor: Colors.light.border },
-  patchTitle: { fontFamily: Fonts.sans, color: Colors.light.accentGreen },
-  patchDescription: { fontFamily: Fonts.body, color: Colors.light.text },
-  controls: { marginBottom: 12, gap: 8 },
-  search: { borderWidth: 1, borderColor: Colors.light.border, borderRadius: 12, padding: 12, backgroundColor: Colors.light.card, fontFamily: Fonts.body },
-  currencyRow: { flexDirection: 'row', gap: 8 },
-  currencyChip: { borderWidth: 1, borderColor: Colors.light.border, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, backgroundColor: Colors.light.card },
-  currencyChipActive: { backgroundColor: Colors.light.tint, borderColor: Colors.light.tint },
-  currencyChipText: { color: Colors.light.text, fontFamily: Fonts.sans },
-  currencyChipTextActive: { color: '#fff' },
-  filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
-  filterChip: { borderWidth: 1, borderColor: Colors.light.border, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, backgroundColor: Colors.light.card },
-  filterChipActive: { backgroundColor: Colors.light.accentGreen, borderColor: Colors.light.accentGreen },
-  filterChipText: { color: Colors.light.text, fontFamily: Fonts.body },
-  filterChipTextActive: { color: '#fff' },
-  card: { backgroundColor: Colors.light.card, borderRadius: 20, overflow: 'hidden', marginBottom: 16, borderWidth: 1, borderColor: Colors.light.border, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 2 },
-  image: { width: '100%', height: 220 },
-  imagePlaceholder: { alignItems: 'center', justifyContent: 'center', backgroundColor: '#e5e5e5' },
-  cardBody: { padding: 14, gap: 4 },
-  title: { fontSize: 20, fontFamily: Fonts.sans, color: Colors.light.text },
-  subtitle: { color: '#4b5563', fontFamily: Fonts.body },
-  price: { marginTop: 4, fontSize: 16, fontFamily: Fonts.sans, color: Colors.light.tint },
-  labelsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6 },
-  label: { backgroundColor: Colors.light.accentYellow, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
-  labelText: { color: Colors.light.text, fontSize: 12, fontFamily: Fonts.body },
-  empty: { flexGrow: 1, justifyContent: 'center', alignItems: 'center' },
-  emptyText: { color: '#777', fontFamily: Fonts.body },
+  header: { backgroundColor: Brand.ink, paddingTop: 24, paddingBottom: 18, gap: 14 },
+  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 },
+  currency: { flexDirection: 'row', borderWidth: 1, borderColor: Brand.bone },
+  curBtn: { minWidth: 56, minHeight: 40, alignItems: 'center', justifyContent: 'center' },
+  curText: { fontFamily: Type.monoBold, fontSize: 12, color: Brand.bone, letterSpacing: 1 },
+  search: { borderWidth: 1, borderColor: '#3A3836', color: Brand.bone, minHeight: 46, paddingHorizontal: 14, fontFamily: Type.body, fontSize: 16 },
+  empty: { padding: 40, borderWidth: 1, borderColor: Brand.ink, alignItems: 'center', gap: 8 },
+  emptyText: { fontFamily: Type.body, fontSize: 16, color: Brand.smoke },
 });
