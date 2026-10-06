@@ -8,9 +8,9 @@ import { Brand, Type } from '@/constants/theme';
 import { CATALOG, CATEGORIES, COLLECTIONS, TAGLINES } from '@/src/constants/catalog';
 import { useBag } from '@/src/context/BagContext';
 import { Button, Display, Eyebrow, FlagStripe, ProductCard } from '@/src/components/ui';
+import { ShopTheLook } from '@/src/components/ShopTheLook';
 
 const LOGO = require('@/assets/images/crazy-button-logo.png');
-const DRIP_ZONE = require('@/assets/images/products/drip-zone.png');
 
 function Marquee() {
   const x = useRef(new Animated.Value(0)).current;
@@ -110,12 +110,8 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Lookbook */}
-        <View style={{ backgroundColor: Brand.ink, padding: pad, paddingVertical: 40, gap: 16 }}>
-          <Eyebrow color={Brand.vapour}>04 — Lookbook</Eyebrow>
-          <Display size={wide ? 56 : 38} color={Brand.bone}>Drip Zone themes</Display>
-          <Image source={DRIP_ZONE} style={{ width: '100%', aspectRatio: 1, maxWidth: 900 }} contentFit="cover" />
-        </View>
+        {/* Shop the look */}
+        <ShopTheLook wide={wide} pad={pad} />
 
         {/* Patches */}
         <View style={{ padding: pad, paddingTop: 40, gap: 16, maxWidth: 1360, width: '100%', alignSelf: 'center' }}>
