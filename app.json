@@ -23,7 +23,7 @@
     "web": {
       "output": "single",
       "favicon": "./assets/images/crazy-button-logo.png",
-      "name": "Crazy Button SA \u2014 Wear Loud. Walk Proud.",
+      "name": "Crazy Button SA — Wear Loud. Walk Proud.",
       "themeColor": "#121212",
       "backgroundColor": "#EDE8DF"
     },
@@ -44,7 +44,8 @@
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": true
+      "reactCompiler": true,
+      "baseUrl": "/shop"
     },
     "extra": {
       "router": {},

@@ -1,11 +1,35 @@
 {
   "hosting": {
     "public": "dist",
-    "ignore": ["firebase.json", "**/.*"],
-    "cleanUrls": true,
-    "rewrites": [{ "source": "**", "destination": "/index.html" }],
+    "ignore": [
+      "firebase.json",
+      "**/.*"
+    ],
+    "cleanUrls": false,
+    "rewrites": [
+      {
+        "source": "/shop",
+        "destination": "/shop/index.html"
+      },
+      {
+        "source": "/shop/**",
+        "destination": "/shop/index.html"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
     "headers": [
-      { "source": "**/*.@(js|css|png|jpg|jpeg|woff2|ttf)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
+      {
+        "source": "**/*.@(js|css|png|jpg|jpeg|woff2|ttf)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
+      }
     ]
   }
 }

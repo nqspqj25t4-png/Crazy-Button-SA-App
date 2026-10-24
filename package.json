@@ -8,7 +8,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "build:web": "rm -rf dist && expo export --platform web --output-dir dist/shop && cp landing/index.html dist/index.html && cp -R landing dist/landing && rm dist/landing/index.html",
+    "deploy:web": "npm run build:web && npx --yes firebase-tools@latest deploy --only hosting --non-interactive"
   },
   "dependencies": {
     "@expo-google-fonts/anton": "^0.4.2",
