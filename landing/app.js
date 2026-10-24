@@ -45,68 +45,100 @@ const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(3, 4, 6)
 const rim = new THREE.DirectionalLight(0xF2B33D, 0.8); rim.position.set(-5, -2, -3); scene.add(rim);
 
 const button = new THREE.Group();
-const holeR = 0.12, holeD = 0.33;
-const holes = [[0, holeD], [holeD, 0], [0, -holeD], [-holeD, 0]];
 
-// body: disc with four real holes
-const shape = new THREE.Shape();
-shape.absarc(0, 0, 1, 0, Math.PI * 2, false);
-holes.forEach(([x, y]) => { const h = new THREE.Path(); h.absarc(x, y, holeR, 0, Math.PI * 2, true); shape.holes.push(h); });
+/* The Crazy Button logo as an enamel badge. Three versions from the brand kit,
+   cross-fading on a loop: full colour on white, black on white, white on black. */
+const VARIANTS = [
+  { img: '/landing/img/face-colour.png', bg: '#FBF9F4', body: 0xF4F1EA, band: 0xC8322B },
+  { img: '/landing/img/face-black.png',  bg: '#FBF9F4', body: 0xF4F1EA, band: 0x121212 },
+  { img: '/landing/img/face-white.png',  bg: '#121212', body: 0x1A1A1A, band: 0xF2B33D },
+];
+const loader = new THREE.ImageLoader();
+function faceTexture(v) {
+  const N = 1024, c = document.createElement('canvas'); c.width = c.height = N;
+  const g = c.getContext('2d');
+  g.fillStyle = v.bg; g.beginPath(); g.arc(N / 2, N / 2, N / 2, 0, Math.PI * 2); g.fill();
+  // fine stitched ring inside the edge, like the logo's outer ring
+  g.strokeStyle = v.bg === '#121212' ? 'rgba(237,232,223,.35)' : 'rgba(18,18,18,.18)';
+  g.lineWidth = 6; g.setLineDash([18, 14]); g.beginPath(); g.arc(N / 2, N / 2, N * 0.47, 0, Math.PI * 2); g.stroke();
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+  loader.load(v.img, (im) => { g.setLineDash([]); g.drawImage(im, 0, 0, N, N); tex.needsUpdate = true; });
+  return tex;
+}
+const faces = VARIANTS.map(faceTexture);
+
 const depth = 0.16;
-const bodyGeo = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: true, bevelThickness: 0.09, bevelSize: 0.07, bevelSegments: 10, curveSegments: 112 });
+const disc = new THREE.Shape(); disc.absarc(0, 0, 1, 0, Math.PI * 2, false);
+const bodyGeo = new THREE.ExtrudeGeometry(disc, { depth, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.06, bevelSegments: 10, curveSegments: 128 });
 bodyGeo.translate(0, 0, -depth / 2);
-const blue = new THREE.MeshPhysicalMaterial({ color: 0x22378f, roughness: 0.28, metalness: 0.05, clearcoat: 1, clearcoatRoughness: 0.06, sheen: 0.3, sheenColor: new THREE.Color(0x9FC3D9) });
-button.add(new THREE.Mesh(bodyGeo, blue));
+const bodyMat = new THREE.MeshPhysicalMaterial({ color: VARIANTS[0].body, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08 });
+button.add(new THREE.Mesh(bodyGeo, bodyMat));
 
-// raised lip front and back
-const lipGeo = new THREE.TorusGeometry(0.84, 0.075, 28, 180);
-[0.155, -0.155].forEach((z) => { const m = new THREE.Mesh(lipGeo, blue); m.position.z = z; button.add(m); });
-
-// red edge band (from the logo's red ring)
-const band = new THREE.Mesh(new THREE.CylinderGeometry(1.088, 1.088, 0.075, 160, 1, true),
-  new THREE.MeshPhysicalMaterial({ color: 0xC8322B, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.1, side: THREE.DoubleSide }));
+// thin coloured band around the edge
+const bandMat = new THREE.MeshPhysicalMaterial({ color: VARIANTS[0].band, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.1, side: THREE.DoubleSide });
+const band = new THREE.Mesh(new THREE.CylinderGeometry(1.068, 1.068, 0.07, 160, 1, true), bandMat);
 band.rotation.x = Math.PI / 2; button.add(band);
 
-// stitched thread through the holes: gold and green crossing, like a sewn-on button
-function stitch(a, b, color) {
-  const [ax, ay] = a, [bx, by] = b;
-  const pts = [
-    new THREE.Vector3(ax, ay, -0.12), new THREE.Vector3(ax, ay, 0.17),
-    new THREE.Vector3(ax * 0.55, ay * 0.55, 0.255), new THREE.Vector3(0, 0, 0.275),
-    new THREE.Vector3(bx * 0.55, by * 0.55, 0.255), new THREE.Vector3(bx, by, 0.17), new THREE.Vector3(bx, by, -0.12),
-  ];
-  const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 96, 0.042, 14, false);
-  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.75, metalness: 0 });
-  // twisted-thread look: two slightly offset strands
-  const g = new THREE.Group();
-  const s1 = new THREE.Mesh(geo, mat); s1.position.x += 0.012; g.add(s1);
-  const s2 = new THREE.Mesh(geo, mat); s2.position.x -= 0.012; s2.position.y += 0.01; g.add(s2);
-  return g;
+// enamel faces, front and back: base layer + a cross-fade layer on top
+const faceGeo = new THREE.CircleGeometry(0.985, 128);
+const zFace = depth / 2 + 0.081;
+function enamel(map, transparent) {
+  return new THREE.MeshPhysicalMaterial({ map, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.04, transparent, opacity: transparent ? 0 : 1, depthWrite: !transparent });
 }
-button.add(stitch(holes[0], holes[2], 0xF2B33D));
-const s2 = stitch(holes[3], holes[1], 0x0F5A36); s2.position.z = 0.02; button.add(s2);
+const sides = [1, -1].map((dir) => {
+  const base = new THREE.Mesh(faceGeo, enamel(faces[0], false));
+  const top = new THREE.Mesh(faceGeo, enamel(faces[1], true));
+  base.position.z = dir * zFace; top.position.z = dir * (zFace + 0.002);
+  if (dir < 0) { base.rotation.y = Math.PI; top.rotation.y = Math.PI; }
+  button.add(base, top);
+  return { base, top };
+});
+
+// raised lip around the face
+const lipMat = bodyMat;
+const lipGeo = new THREE.TorusGeometry(1.0, 0.045, 20, 180);
+[1, -1].forEach((dir) => { const m = new THREE.Mesh(lipGeo, lipMat); m.position.z = dir * (zFace - 0.01); button.add(m); });
 
 scene.add(button);
+
+// colour cycle: hold each version, then cross-fade to the next
+let vi = 0, fadeT = 0;
+const HOLD = reduced ? 9 : 3.2, FADE = 1.1;
+const cA = new THREE.Color(), cB = new THREE.Color();
+function cycle(dt) {
+  fadeT += dt;
+  const next = (vi + 1) % VARIANTS.length;
+  const f = Math.min(1, Math.max(0, (fadeT - HOLD) / FADE));
+  sides.forEach(({ base, top }) => { base.material.map = faces[vi]; top.material.map = faces[next]; top.material.opacity = f; });
+  bodyMat.color.copy(cA.setHex(VARIANTS[vi].body)).lerp(cB.setHex(VARIANTS[next].body), f);
+  bandMat.color.copy(cA.setHex(VARIANTS[vi].band)).lerp(cB.setHex(VARIANTS[next].band), f);
+  if (fadeT >= HOLD + FADE) {
+    vi = next; fadeT = 0;
+    sides.forEach(({ base, top }) => { base.material.map = faces[vi]; base.material.needsUpdate = true; top.material.opacity = 0; top.material.needsUpdate = true; });
+  }
+}
+window.__cbVariant = () => vi;
 
 /* ---------- choreography ---------- */
 // x,y in fractions of the half-viewport; s = size; rx/ry/rz in radians
 const TAU = Math.PI * 2;  // a full turn between stops, always facing the viewer at each stop
 const DESK = [
-  { x: 0.48, y: -0.02, s: 1.0, rx: -0.38, ry: -0.55, rz: 0.12 },        // hero
-  { x: -0.46, y: 0.0, s: 0.92, rx: 0.22, ry: TAU + 0.5, rz: -0.2 },     // story
-  { x: 0.80, y: 0.66, s: 0.30, rx: -0.2, ry: 2 * TAU - 0.45, rz: 0.3 }, // fresh
-  { x: 0.56, y: 0.0, s: 0.80, rx: -0.25, ry: 3 * TAU + 0.45, rz: 0.15 },// streets
-  { x: 0.76, y: 0.60, s: 0.34, rx: 0.3, ry: 4 * TAU - 0.4, rz: -0.3 },  // drops
-  { x: -0.80, y: 0.66, s: 0.28, rx: -0.2, ry: 5 * TAU + 0.4, rz: 0.2 }, // looks
+  { x: 0.48, y: -0.02, s: 1.0, rx: -0.16, ry: -0.38, rz: 0 },          // hero
+  { x: -0.46, y: 0.0, s: 0.92, rx: 0.22, ry: TAU + 0.5, rz: 0 },     // story
+  { x: 0.80, y: 0.66, s: 0.30, rx: -0.2, ry: 2 * TAU - 0.45, rz: 0 }, // fresh
+  { x: 0.56, y: 0.0, s: 0.80, rx: -0.25, ry: 3 * TAU + 0.45, rz: 0 },// streets
+  { x: 0.76, y: 0.60, s: 0.34, rx: 0.3, ry: 4 * TAU - 0.4, rz: 0 },  // drops
+  { x: -0.80, y: 0.66, s: 0.28, rx: -0.2, ry: 5 * TAU + 0.4, rz: 0 }, // looks
   { x: 0.0, y: 0.40, s: 0.46, rx: -0.12, ry: 6 * TAU, rz: 0 },          // final
 ];
 const MOBILE = [
-  { x: 0.0, y: 0.40, s: 0.70, rx: -0.35, ry: -0.5, rz: 0.1 },
-  { x: 0.98, y: 0.80, s: 0.26, rx: 0.22, ry: TAU + 0.5, rz: -0.2 },
-  { x: 0.98, y: 0.80, s: 0.26, rx: -0.2, ry: 2 * TAU - 0.45, rz: 0.3 },
-  { x: 0.98, y: 0.80, s: 0.26, rx: -0.25, ry: 3 * TAU + 0.45, rz: 0.15 },
-  { x: 0.98, y: 0.80, s: 0.26, rx: 0.3, ry: 4 * TAU - 0.4, rz: -0.3 },
-  { x: 0.98, y: 0.80, s: 0.26, rx: -0.2, ry: 5 * TAU + 0.4, rz: 0.2 },
+  { x: 0.0, y: 0.40, s: 0.70, rx: -0.14, ry: -0.3, rz: 0 },
+  { x: 0.98, y: 0.80, s: 0.26, rx: 0.22, ry: TAU + 0.5, rz: 0 },
+  { x: 0.98, y: 0.80, s: 0.26, rx: -0.2, ry: 2 * TAU - 0.45, rz: 0 },
+  { x: 0.98, y: 0.80, s: 0.26, rx: -0.25, ry: 3 * TAU + 0.45, rz: 0 },
+  { x: 0.98, y: 0.80, s: 0.26, rx: 0.3, ry: 4 * TAU - 0.4, rz: 0 },
+  { x: 0.98, y: 0.80, s: 0.26, rx: -0.2, ry: 5 * TAU + 0.4, rz: 0 },
   { x: 0.0, y: 0.36, s: 0.50, rx: -0.12, ry: 6 * TAU, rz: 0 },
 ];
 
@@ -157,6 +189,7 @@ function frame() {
   const dt = Math.min(clock.getDelta(), 0.25);
   const t = clock.elapsedTime;
   const goal = target(window.scrollY, mobile ? MOBILE : DESK);
+  cycle(dt);
   const k = reduced ? 1 : 1 - Math.exp(-dt * 5.5);   // frame-rate independent easing
   for (const p in goal) cur[p] += (goal[p] - cur[p]) * k;
 
@@ -164,8 +197,8 @@ function frame() {
   const radius = cur.s * unit * 0.62;
   button.scale.setScalar(radius);
   button.position.set(cur.x * halfW, cur.y * halfH + (reduced ? 0 : Math.sin(t * 1.1) * 0.06 * radius), 0);
-  const idle = reduced ? 0 : Math.sin(t * 0.5) * 0.35;
-  button.rotation.set(cur.rx + mouse.y * 0.25, cur.ry + idle + mouse.x * 0.35, cur.rz);
+  const idle = reduced ? 0 : Math.sin(t * 0.5) * 0.22;
+  button.rotation.set(cur.rx + mouse.y * 0.18, cur.ry + idle + mouse.x * 0.28, cur.rz);
 
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
