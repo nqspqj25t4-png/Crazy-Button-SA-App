@@ -99,14 +99,9 @@ window.__cbVariant = () => vi;
    next slot as you scroll, so it always sits in free space and never covers text.
    One full turn between slots, facing the viewer whenever it is parked. */
 const TAU = Math.PI * 2;
-const ROT = [
-  { rx: -0.14, ry: -0.36 },          // hero
-  { rx: 0.10, ry: TAU + 0.32 },      // story
-  { rx: -0.08, ry: 2 * TAU - 0.30 }, // fresh
-  { rx: -0.12, ry: 3 * TAU + 0.34 }, // streets
-  { rx: 0.10, ry: 4 * TAU - 0.30 },  // drops
-  { rx: -0.08, ry: 5 * TAU + 0.30 }, // looks
-  { rx: -0.06, ry: 6 * TAU },        // final
+const ROT = [            // parked dead-centre facing the viewer; one full turn between sections
+  { rx: 0, ry: 0 }, { rx: 0, ry: TAU }, { rx: 0, ry: 2 * TAU }, { rx: 0, ry: 3 * TAU },
+  { rx: 0, ry: 4 * TAU }, { rx: 0, ry: 5 * TAU }, { rx: 0, ry: 6 * TAU },
 ];
 const slots = [...document.querySelectorAll('.slot[data-slot]')].sort((a, b) => a.dataset.slot - b.dataset.slot);
 const LOGO_ASPECT = 1497 / 1401;   // logo width / height
@@ -177,8 +172,13 @@ function frame() {
   button.scale.setScalar(scale);
   const bob = reduced ? 0 : Math.sin(t * 1.1) * 0.035 * scale;
   button.position.set((cur.cx / W - 0.5) * 2 * halfW, -(cur.cy / H - 0.5) * 2 * halfH + bob, 0);
-  const idle = reduced ? 0 : Math.sin(t * 0.5) * 0.16;
-  button.rotation.set(cur.rx + mouse.y * 0.14, cur.ry + idle + mouse.x * 0.22, 0);
+  // face the camera squarely wherever the logo sits on screen (no perspective tilt),
+  // then add the spin between sections and a gentle side-to-side sway
+  const idle = reduced ? 0 : Math.sin(t * 0.6) * 0.07;   // even sway, centred on straight-ahead
+  button.rotation.set(0, 0, 0);
+  button.lookAt(camera.position);
+  button.rotateY(cur.ry + idle);
+  button.rotateX(cur.rx);
 
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
