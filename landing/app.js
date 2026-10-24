@@ -46,12 +46,11 @@ const rim = new THREE.DirectionalLight(0xF2B33D, 0.8); rim.position.set(-5, -2, 
 
 const button = new THREE.Group();
 
-/* The Crazy Button logo as an enamel badge. Three versions from the brand kit,
-   cross-fading on a loop: full colour on white, black on white, white on black. */
+/* The Crazy Button logo as an enamel badge, switching between the two official logos:
+   full colour and black & white, cross-fading on a loop. */
 const VARIANTS = [
   { img: '/landing/img/face-colour.png', bg: '#FBF9F4', body: 0xF4F1EA, band: 0xC8322B },
   { img: '/landing/img/face-black.png',  bg: '#FBF9F4', body: 0xF4F1EA, band: 0x121212 },
-  { img: '/landing/img/face-white.png',  bg: '#121212', body: 0x1A1A1A, band: 0xF2B33D },
 ];
 const loader = new THREE.ImageLoader();
 function faceTexture(v) {
