@@ -46,76 +46,42 @@ const rim = new THREE.DirectionalLight(0xF2B33D, 0.8); rim.position.set(-5, -2, 
 
 const button = new THREE.Group();
 
-/* The Crazy Button logo as an enamel badge, switching between the two official logos:
-   full colour and black & white, cross-fading on a loop. */
-const VARIANTS = [
-  { img: '/landing/img/face-colour.png', bg: '#FBF9F4', body: 0xF4F1EA, band: 0xC8322B },
-  { img: '/landing/img/face-black.png',  bg: '#FBF9F4', body: 0xF4F1EA, band: 0x121212 },
-];
-const loader = new THREE.ImageLoader();
-function faceTexture(v) {
-  const N = 1024, c = document.createElement('canvas'); c.width = c.height = N;
-  const g = c.getContext('2d');
-  g.fillStyle = v.bg; g.beginPath(); g.arc(N / 2, N / 2, N / 2, 0, Math.PI * 2); g.fill();
-  // fine stitched ring inside the edge, like the logo's outer ring
-  g.strokeStyle = v.bg === '#121212' ? 'rgba(237,232,223,.35)' : 'rgba(18,18,18,.18)';
-  g.lineWidth = 6; g.setLineDash([18, 14]); g.beginPath(); g.arc(N / 2, N / 2, N * 0.47, 0, Math.PI * 2); g.stroke();
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
-  loader.load(v.img, (im) => { g.setLineDash([]); g.drawImage(im, 0, 0, N, N); tex.needsUpdate = true; });
-  return tex;
-}
-const faces = VARIANTS.map(faceTexture);
-
-const depth = 0.16;
-const disc = new THREE.Shape(); disc.absarc(0, 0, 1, 0, Math.PI * 2, false);
-const bodyGeo = new THREE.ExtrudeGeometry(disc, { depth, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.06, bevelSegments: 10, curveSegments: 128 });
-bodyGeo.translate(0, 0, -depth / 2);
-const bodyMat = new THREE.MeshPhysicalMaterial({ color: VARIANTS[0].body, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08 });
-button.add(new THREE.Mesh(bodyGeo, bodyMat));
-
-// thin coloured band around the edge
-const bandMat = new THREE.MeshPhysicalMaterial({ color: VARIANTS[0].band, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.1, side: THREE.DoubleSide });
-const band = new THREE.Mesh(new THREE.CylinderGeometry(1.068, 1.068, 0.07, 160, 1, true), bandMat);
-band.rotation.x = Math.PI / 2; button.add(band);
-
-// enamel faces, front and back: base layer + a cross-fade layer on top
-const faceGeo = new THREE.CircleGeometry(0.985, 128);
-const zFace = depth / 2 + 0.081;
-function enamel(map, transparent) {
-  return new THREE.MeshPhysicalMaterial({ map, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.04, transparent, opacity: transparent ? 0 : 1, depthWrite: !transparent });
-}
-const sides = [1, -1].map((dir) => {
-  const base = new THREE.Mesh(faceGeo, enamel(faces[0], false));
-  const top = new THREE.Mesh(faceGeo, enamel(faces[1], true));
-  base.position.z = dir * zFace; top.position.z = dir * (zFace + 0.002);
-  if (dir < 0) { base.rotation.y = Math.PI; top.rotation.y = Math.PI; }
-  button.add(base, top);
-  return { base, top };
-});
-
-// raised lip around the face
-const lipMat = bodyMat;
-const lipGeo = new THREE.TorusGeometry(1.0, 0.045, 20, 180);
-[1, -1].forEach((dir) => { const m = new THREE.Mesh(lipGeo, lipMat); m.position.z = dir * (zFace - 0.01); button.add(m); });
-
+/* The Crazy Button logo itself in 3D, with no disc behind it. Each colour of the
+   logo is traced to vector shapes (logo-shapes.json) and extruded into glossy
+   enamel. It fades between the two official logos: full colour and black & white. */
+const COLOUR = { blue: 0x283A8C, green: 0x0A7F50, gold: 0xF7B212, red: 0xE1352F, black: 0x0E0E0E };
+const MONO = 0x111111;
+const mats = {};
+const DEPTH = 0.075;
+fetch('/landing/img/logo-shapes.json').then((r) => r.json()).then((data) => {
+  const logo = new THREE.Group();
+  data.layers.forEach((L) => {
+    const shapes = L.shapes.map((sh) => {
+      const s = new THREE.Shape(sh.o.map(([x, y]) => new THREE.Vector2(x, y)));
+      sh.h.forEach((h) => s.holes.push(new THREE.Path(h.map(([x, y]) => new THREE.Vector2(x, y)))));
+      return s;
+    });
+    const geo = new THREE.ExtrudeGeometry(shapes, { depth: DEPTH, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.0035, bevelSegments: 3, curveSegments: 6 });
+    geo.translate(0, 0, -DEPTH / 2);
+    const m = new THREE.MeshPhysicalMaterial({ color: COLOUR[L.name], roughness: 0.26, metalness: 0.05, clearcoat: 1, clearcoatRoughness: 0.05 });
+    mats[L.name] = m;
+    logo.add(new THREE.Mesh(geo, m));
+  });
+  logo.position.y = 0.03;
+  button.add(logo);
+}).catch(() => { document.getElementById('fallback').style.display = 'block'; });
 scene.add(button);
 
-// colour cycle: hold each version, then cross-fade to the next
+// hold each logo, then cross-fade colour <-> black & white
 let vi = 0, fadeT = 0;
-const HOLD = reduced ? 9 : 3.2, FADE = 1.1;
-const cA = new THREE.Color(), cB = new THREE.Color();
+const HOLD = reduced ? 9 : 3.4, FADE = 1.2;
+const tmp = new THREE.Color(), mono = new THREE.Color(MONO);
 function cycle(dt) {
   fadeT += dt;
-  const next = (vi + 1) % VARIANTS.length;
-  const f = Math.min(1, Math.max(0, (fadeT - HOLD) / FADE));
-  sides.forEach(({ base, top }) => { base.material.map = faces[vi]; top.material.map = faces[next]; top.material.opacity = f; });
-  bodyMat.color.copy(cA.setHex(VARIANTS[vi].body)).lerp(cB.setHex(VARIANTS[next].body), f);
-  bandMat.color.copy(cA.setHex(VARIANTS[vi].band)).lerp(cB.setHex(VARIANTS[next].band), f);
-  if (fadeT >= HOLD + FADE) {
-    vi = next; fadeT = 0;
-    sides.forEach(({ base, top }) => { base.material.map = faces[vi]; base.material.needsUpdate = true; top.material.opacity = 0; top.material.needsUpdate = true; });
-  }
+  let f = Math.min(1, Math.max(0, (fadeT - HOLD) / FADE));
+  if (fadeT >= HOLD + FADE) { vi = 1 - vi; fadeT = 0; f = 0; }
+  const toMono = vi === 0 ? f : 1 - f;
+  for (const n in mats) mats[n].color.copy(tmp.setHex(COLOUR[n])).lerp(mono, toMono);
 }
 window.__cbVariant = () => vi;
 
