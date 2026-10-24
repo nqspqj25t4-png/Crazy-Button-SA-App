@@ -157,6 +157,24 @@ footer a:hover{color:var(--gold)}
 .rv.in{opacity:1;transform:none}
 .no-js .rv,.reduced .rv{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.marquee div,.scrollhint i{animation:none}}
+
+/* slots: empty spaces in the layout where the 3D logo parks */
+.slot{pointer-events:none;aspect-ratio:1497/1401;width:100%}
+.hero{position:relative}
+.slot-hero{position:absolute;right:var(--pad);top:50%;transform:translateY(-46%);width:min(42vw,620px)}
+.slot-col{max-width:540px;justify-self:center}
+.split.right .slot-col{grid-column:1;grid-row:1}.split.right .copy{grid-column:2;grid-row:1}
+.slot-sm{width:clamp(110px,13vw,190px);flex:none}
+.final .slot{width:min(34vh,300px);height:auto;margin:0 auto}
+@media(max-width:820px){
+ .slot-hero{left:50%;right:auto;top:84px;transform:translateX(-50%);width:min(82vw,46svh)}
+ .slot-col{width:56vw;justify-self:start}
+ #streets .slot-col{display:none}
+ .split.right .copy{grid-column:1;grid-row:2}
+ .slot-sm{width:92px}
+ .head{flex-wrap:nowrap;align-items:center}
+ .head .link{display:none}
+}
 </style>
 </head>
 <body class="no-js">
@@ -187,6 +205,7 @@ footer a:hover{color:var(--gold)}
       </div>
     </div>
     <div class="scrollhint"><i></i>Scroll</div>
+    <div class="slot slot-hero" data-slot="0" aria-hidden="true"></div>
   </section>
   <div class="flag" aria-hidden="true"><i style="background:var(--green)"></i><i style="background:var(--gold)"></i><i style="background:var(--ink)"></i><i style="background:var(--red)"></i><i style="background:var(--blue)"></i><i style="background:var(--bone)"></i></div>
   <div class="marquee" aria-label="Wear loud. Walk proud. For the brave, from the block. Mzansi made, globally played."><div>
@@ -196,6 +215,7 @@ footer a:hover{color:var(--gold)}
 
   <section class="block" id="story" data-key="1">
     <div class="wrap split right">
+      <div class="slot slot-col" data-slot="1" aria-hidden="true"></div>
       <div class="copy">
         <div class="eyebrow rv">01 — The button</div>
         <h2 class="display rv">One button.<br>Fifteen years<br>of drip.</h2>
@@ -214,6 +234,7 @@ footer a:hover{color:var(--gold)}
     <div class="wrap">
       <div class="head">
         <div class="copy"><div class="eyebrow rv">02 — New arrivals</div><h2 class="display rv">Fresh off<br>the needle</h2></div>
+        <div class="slot slot-sm" data-slot="2" aria-hidden="true"></div>
         <a class="link rv" href="/shop/catalog">View all 33 pieces →</a>
       </div>
       <div class="cards">
@@ -239,15 +260,18 @@ footer a:hover{color:var(--gold)}
           <a class="street" href="/shop/catalog"><span class="n">06</span><h3>Mama Said<span class="dot" style="background:var(--ink)"></span></h3><p>Wear something warm.</p></a>
         </div>
       </div>
+      <div class="slot slot-col" data-slot="3" aria-hidden="true"></div>
     </div>
   </section>
 
   <section class="block drops" id="drops" data-key="4">
     <div class="wrap">
-      <div class="copy">
+      <div class="head" style="align-items:center"><div class="copy">
         <div class="eyebrow rv">04 — The calendar</div>
         <h2 class="display rv">Six weeks.<br>Six drops.</h2>
         <p class="rv">A new drop every week for six weeks, each built for a different crew. Limited runs, no re-ups.</p>
+      </div>
+        <div class="slot slot-sm" data-slot="4" aria-hidden="true"></div>
       </div>
       <div class="weeks">
         <div class="week rv"><span class="no">Week 01</span><h3>No Re-Up</h3><p><strong style="color:var(--bone)">Because once it’s gone, it’s gone.</strong> Small runs, numbered pieces and a 24-hour cop window. For sneakerheads, resale kings and street flexers.</p><span class="tag">Limited drop</span></div>
@@ -264,6 +288,7 @@ footer a:hover{color:var(--gold)}
     <div class="wrap">
       <div class="head">
         <div class="copy"><div class="eyebrow rv">05 — Shop the look</div><h2 class="display rv">Wear it<br>like this</h2></div>
+        <div class="slot slot-sm" data-slot="5" aria-hidden="true"></div>
         <a class="link rv" href="/shop/">Shop all looks →</a>
       </div>
       <div class="looks">
@@ -278,7 +303,7 @@ footer a:hover{color:var(--gold)}
   <section class="final" id="final" data-key="6">
     <div class="wrap">
       <div class="eyebrow rv" style="color:var(--vapour)">Drop live · No re-up</div>
-      <div class="spacer" aria-hidden="true"></div>
+      <div class="slot" data-slot="6" aria-hidden="true"></div>
       <h2 class="display rv">Cop it<br><em>before it’s gone.</em></h2>
       <p class="rv">33 pieces, 12 patches, one button. Mzansi made, globally played.</p>
       <a class="btn btn-gold rv" href="/shop/">Enter the shop</a>

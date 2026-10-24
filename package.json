@@ -9,7 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "build:web": "rm -rf dist && expo export --platform web --output-dir dist/shop && cp landing/index.html dist/index.html && cp -R landing dist/landing && rm dist/landing/index.html",
+    "build:web": "rm -rf dist && expo export --platform web --output-dir dist/shop && cp landing/index.html dist/index.html && cp -R landing dist/landing && rm dist/landing/index.html && node scripts/stamp-landing.js",
     "deploy:web": "npm run build:web && npx --yes firebase-tools@latest deploy --only hosting --non-interactive"
   },
   "dependencies": {

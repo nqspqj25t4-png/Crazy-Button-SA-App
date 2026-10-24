@@ -51,6 +51,7 @@ const button = new THREE.Group();
    enamel. It fades between the two official logos: full colour and black & white. */
 const COLOUR = { blue: 0x283A8C, green: 0x0A7F50, gold: 0xF7B212, red: 0xE1352F, black: 0x0E0E0E };
 const MONO = 0x111111;
+const BONE = 0xEDE8DF;
 const mats = {};
 const DEPTH = 0.075;
 fetch('/landing/img/logo-shapes.json').then((r) => r.json()).then((data) => {
@@ -76,94 +77,108 @@ scene.add(button);
 let vi = 0, fadeT = 0;
 const HOLD = reduced ? 9 : 3.4, FADE = 1.2;
 const tmp = new THREE.Color(), mono = new THREE.Color(MONO);
+let darkness = 0;   // 0 on light sections, 1 on the dark ones (set by the choreography)
+const cLight = new THREE.Color(), cDark = new THREE.Color(), mLight = new THREE.Color(MONO), mDark = new THREE.Color(BONE);
 function cycle(dt) {
   fadeT += dt;
   let f = Math.min(1, Math.max(0, (fadeT - HOLD) / FADE));
   if (fadeT >= HOLD + FADE) { vi = 1 - vi; fadeT = 0; f = 0; }
-  const toMono = vi === 0 ? f : 1 - f;
-  for (const n in mats) mats[n].color.copy(tmp.setHex(COLOUR[n])).lerp(mono, toMono);
+  const toMono = vi === 0 ? f : 1 - f;                           // 0 = colour logo, 1 = black & white logo
+  for (const n in mats) {
+    cLight.setHex(COLOUR[n]); cDark.setHex(n === 'black' ? BONE : COLOUR[n]);
+    const base = cLight.lerp(cDark, darkness);
+    const mono = tmp.copy(mLight).lerp(mDark, darkness);
+    mats[n].color.copy(base).lerp(mono, toMono);
+  }
 }
 window.__cbVariant = () => vi;
 
-/* ---------- choreography ---------- */
-// x,y in fractions of the half-viewport; s = size; rx/ry/rz in radians
-const TAU = Math.PI * 2;  // a full turn between stops, always facing the viewer at each stop
-const DESK = [
-  { x: 0.48, y: -0.02, s: 1.0, rx: -0.16, ry: -0.38, rz: 0 },          // hero
-  { x: -0.46, y: 0.0, s: 0.92, rx: 0.22, ry: TAU + 0.5, rz: 0 },     // story
-  { x: 0.80, y: 0.66, s: 0.30, rx: -0.2, ry: 2 * TAU - 0.45, rz: 0 }, // fresh
-  { x: 0.56, y: 0.0, s: 0.80, rx: -0.25, ry: 3 * TAU + 0.45, rz: 0 },// streets
-  { x: 0.76, y: 0.60, s: 0.34, rx: 0.3, ry: 4 * TAU - 0.4, rz: 0 },  // drops
-  { x: -0.80, y: 0.66, s: 0.28, rx: -0.2, ry: 5 * TAU + 0.4, rz: 0 }, // looks
-  { x: 0.0, y: 0.40, s: 0.46, rx: -0.12, ry: 6 * TAU, rz: 0 },          // final
+/* ---------- choreography ----------
+   Every section has an empty "slot" in its layout (.slot[data-slot]) where the logo
+   belongs. The logo rides inside the slot of the section on screen and flies to the
+   next slot as you scroll, so it always sits in free space and never covers text.
+   One full turn between slots, facing the viewer whenever it is parked. */
+const TAU = Math.PI * 2;
+const ROT = [
+  { rx: -0.14, ry: -0.36 },          // hero
+  { rx: 0.10, ry: TAU + 0.32 },      // story
+  { rx: -0.08, ry: 2 * TAU - 0.30 }, // fresh
+  { rx: -0.12, ry: 3 * TAU + 0.34 }, // streets
+  { rx: 0.10, ry: 4 * TAU - 0.30 },  // drops
+  { rx: -0.08, ry: 5 * TAU + 0.30 }, // looks
+  { rx: -0.06, ry: 6 * TAU },        // final
 ];
-const MOBILE = [
-  { x: 0.0, y: 0.40, s: 0.70, rx: -0.14, ry: -0.3, rz: 0 },
-  { x: 0.98, y: 0.80, s: 0.26, rx: 0.22, ry: TAU + 0.5, rz: 0 },
-  { x: 0.98, y: 0.80, s: 0.26, rx: -0.2, ry: 2 * TAU - 0.45, rz: 0 },
-  { x: 0.98, y: 0.80, s: 0.26, rx: -0.25, ry: 3 * TAU + 0.45, rz: 0 },
-  { x: 0.98, y: 0.80, s: 0.26, rx: 0.3, ry: 4 * TAU - 0.4, rz: 0 },
-  { x: 0.98, y: 0.80, s: 0.26, rx: -0.2, ry: 5 * TAU + 0.4, rz: 0 },
-  { x: 0.0, y: 0.36, s: 0.50, rx: -0.12, ry: 6 * TAU, rz: 0 },
-];
+const slots = [...document.querySelectorAll('.slot[data-slot]')].sort((a, b) => a.dataset.slot - b.dataset.slot);
+const LOGO_ASPECT = 1497 / 1401;   // logo width / height
+const smooth = (t) => t * t * (3 - 2 * t);
 
-const sections = [...document.querySelectorAll('[data-key]')];
-let anchors = [];
-function measure() {
-  anchors = sections.map((el, i) => {
-    if (i === 0) return 0;
-    const r = el.getBoundingClientRect();
-    const top = r.top + window.scrollY;
-    return Math.max(0, top + Math.min(r.height, window.innerHeight * 1.2) / 2 - window.innerHeight / 2);
-  });
-}
-const ease = (t) => t * t * (3 - 2 * t);
-const lerp = (a, b, t) => a + (b - a) * t;
-function target(y, keys) {
-  if (y <= anchors[0]) return keys[0];
-  for (let i = 0; i < anchors.length - 1; i++) {
-    if (y < anchors[i + 1]) {
-      const t = ease((y - anchors[i]) / Math.max(1, anchors[i + 1] - anchors[i]));
-      const a = keys[i], b = keys[i + 1], o = {};
-      for (const k in a) o[k] = lerp(a[k], b[k], t);
-      return o;
-    }
-  }
-  return keys[keys.length - 1];
-}
-
-let W = 0, H = 0, halfH = 1, halfW = 1, mobile = false;
+let W = 0, H = 0, halfH = 1, halfW = 1;
 function resize() {
-  W = window.innerWidth; H = window.innerHeight; mobile = W < 820;
+  W = window.innerWidth; H = window.innerHeight;
   renderer.setSize(W, H, false);
   camera.aspect = W / H; camera.updateProjectionMatrix();
   halfH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
   halfW = halfH * camera.aspect;
-  measure();
 }
 window.addEventListener('resize', resize);
-window.addEventListener('load', measure);
 resize();
 
-const cur = { ...DESK[0] };
+// slot rectangle -> where the logo should be (screen centre + logo width in px)
+const DARK = slots.map((el) => (el.closest('.drops, .final') ? 1 : 0));
+function slotGoal(el, i) {
+  const r = el.getBoundingClientRect();
+  const w = Math.min(r.width, r.height * LOGO_ASPECT);
+  return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, w, d: DARK[i], rx: ROT[i].rx, ry: ROT[i].ry, on: r.width > 0 };
+}
+function goalNow() {
+  const g = slots.map(slotGoal).filter((x) => x.on);   // slots hidden on this screen size are skipped
+  const mid = H * 0.5;
+  // last slot whose centre is at or above the middle of the screen
+  let i = -1;
+  for (let k = 0; k < g.length; k++) if (g[k].cy <= mid) i = k;
+  if (i < 0) return { cx: g[0].cx, cy: g[0].cy, w: g[0].w, d: g[0].d, rx: g[0].rx, ry: g[0].ry };
+  if (i >= g.length - 1) { const z = g[g.length - 1]; return { cx: z.cx, cy: z.cy, w: z.w, d: z.d, rx: z.rx, ry: z.ry }; }
+  const a = g[i], b = g[i + 1];
+  // Ride along with slot i, then sweep into slot i+1 over a short scroll distance just
+  // before it reaches the middle of the screen; long gaps never mean a long crossing.
+  const dist = Math.max(1, b.cy - a.cy);
+  const r = b.cy - mid;                               // px until slot i+1 is centred
+  const flyLen = Math.min(0.6 * dist, 0.55 * H);
+  const endAt = Math.min(0.12 * dist, 0.1 * H);
+  const t = smooth(Math.min(1, Math.max(0, (flyLen - r) / Math.max(1, flyLen - endAt))));
+  const lift = Math.sin(t * Math.PI) * 0.18;                      // gentle arc while flying
+  return {
+    cx: a.cx + (b.cx - a.cx) * t,
+    cy: a.cy + (b.cy - a.cy) * t,
+    w: (a.w + (b.w - a.w) * t) * (1 - lift * 0.4),
+    rx: a.rx + (b.rx - a.rx) * t,
+    ry: a.ry + (b.ry - a.ry) * t,
+    d: a.d + (b.d - a.d) * t,
+  };
+}
+
+const cur = goalNow();
 const mouse = { x: 0, y: 0 };
 window.addEventListener('pointermove', (e) => { mouse.x = e.clientX / W - 0.5; mouse.y = e.clientY / H - 0.5; }, { passive: true });
 
 const clock = new THREE.Clock();
 function frame() {
-  const dt = Math.min(clock.getDelta(), 0.25);
+  const dt = Math.min(clock.getDelta(), 0.1);
   const t = clock.elapsedTime;
-  const goal = target(window.scrollY, mobile ? MOBILE : DESK);
   cycle(dt);
-  const k = reduced ? 1 : 1 - Math.exp(-dt * 5.5);   // frame-rate independent easing
+  const goal = goalNow();
+  // quick follow so it stays glued to its slot while scrolling, but still glides
+  const k = reduced ? 1 : 1 - Math.exp(-dt * 11);
   for (const p in goal) cur[p] += (goal[p] - cur[p]) * k;
+  darkness = cur.d;
 
-  const unit = Math.min(halfH, halfW * (mobile ? 0.95 : 0.62));
-  const radius = cur.s * unit * 0.62;
-  button.scale.setScalar(radius);
-  button.position.set(cur.x * halfW, cur.y * halfH + (reduced ? 0 : Math.sin(t * 1.1) * 0.06 * radius), 0);
-  const idle = reduced ? 0 : Math.sin(t * 0.5) * 0.22;
-  button.rotation.set(cur.rx + mouse.y * 0.18, cur.ry + idle + mouse.x * 0.28, cur.rz);
+  // screen px -> world units (logo is 2 units wide at scale 1)
+  const scale = (cur.w / W) * halfW;
+  button.scale.setScalar(scale);
+  const bob = reduced ? 0 : Math.sin(t * 1.1) * 0.035 * scale;
+  button.position.set((cur.cx / W - 0.5) * 2 * halfW, -(cur.cy / H - 0.5) * 2 * halfH + bob, 0);
+  const idle = reduced ? 0 : Math.sin(t * 0.5) * 0.16;
+  button.rotation.set(cur.rx + mouse.y * 0.14, cur.ry + idle + mouse.x * 0.22, 0);
 
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
