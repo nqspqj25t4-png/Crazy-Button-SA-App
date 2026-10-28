@@ -64,13 +64,14 @@
   }
 
   // ---------- branded consent banner ----------
-  var css = '#cb-consent{position:fixed;left:16px;bottom:16px;z-index:9999;max-width:420px;background:#121212;color:#EDE8DF;border:1px solid #2E2C2A;padding:20px 20px 18px;font-family:"Source Sans 3",SourceSans3_400Regular,system-ui,sans-serif;font-size:15px;line-height:1.45;box-shadow:0 18px 50px rgba(0,0,0,.35);transform:translateY(12px);opacity:0;transition:transform .35s ease,opacity .35s ease}'
+  var css = '#cb-consent{position:fixed;left:16px;bottom:16px;z-index:9999;max-width:400px;background:#121212;color:#EDE8DF;padding:20px;font-family:"Source Sans 3",SourceSans3_400Regular,system-ui,sans-serif;font-size:16px;line-height:1.45;box-shadow:0 18px 50px rgba(0,0,0,.35);/* taste-skill-ignore: a real floating dialog */transform:translateY(12px);opacity:0;transition:transform .35s ease,opacity .35s ease}'
     + '#cb-consent.in{transform:none;opacity:1}'
-    + '#cb-consent .e{font-family:"Space Mono",SpaceMono_700Bold,ui-monospace,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#F2B33D;margin:0 0 8px}'
+    + '#cb-consent .e{font-family:Anton,Anton_400Regular,Impact,sans-serif;font-size:clamp(24px,2.2vw,32px);line-height:1;text-transform:uppercase;color:#F2B33D;margin:0 0 8px}'
     + '#cb-consent p{margin:0 0 14px}#cb-consent a{color:#EDE8DF;text-decoration:underline;text-underline-offset:3px}'
     + '#cb-consent .r{display:flex;gap:10px;flex-wrap:wrap}'
-    + '#cb-consent button{min-height:46px;padding:0 20px;font-family:"Space Mono",SpaceMono_700Bold,ui-monospace,monospace;font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border:1px solid #F2B33D;background:#F2B33D;color:#121212}'
-    + '#cb-consent button.g{background:transparent;color:#EDE8DF;border-color:#5E5B57}'
+    + '#cb-consent button{min-height:46px;padding:0 22px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer;border:0;background:#F2B33D;color:#121212;transition:background .2s}'
+    + '#cb-consent button:hover{background:#FFC352}'
+    + '#cb-consent button.g{background:#2E2C2A;color:#EDE8DF}#cb-consent button.g:hover{background:#3A3835}'
     + '#cb-consent button:focus-visible{outline:3px solid #F2B33D;outline-offset:3px}'
     + '@media (max-width:520px){#cb-consent{left:12px;right:12px;bottom:12px;max-width:none}}'
     + '@media (prefers-reduced-motion:reduce){#cb-consent{transition:none}}';

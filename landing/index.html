@@ -3,177 +3,296 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Crazy Button SA — Wear Loud. Walk Proud.</title>
-<meta name="description" content="Crazy Button SA. Premium streetwear from Kwa Mashu and Umlazi, Durban. Est. 2011. Bold threads for the brave.">
-<meta property="og:title" content="Crazy Button SA — Wear Loud. Walk Proud.">
-<meta property="og:description" content="Mzansi's loudest streetwear. Straight from Kwa Mashu and Umlazi, rocked worldwide.">
+<title>Crazy Button SA — Durban streetwear since 2011</title>
+<meta name="description" content="Crazy Button SA. Premium streetwear from KwaMashu, Umlazi and Durban. Est. 2011. Six weeks, six drops, no re-ups.">
+<meta property="og:title" content="Crazy Button SA — Wear loud. Walk proud.">
+<meta property="og:description" content="Mzansi's loudest streetwear, straight from KwaMashu, Umlazi and Durban.">
 <meta property="og:image" content="/landing/img/look4.webp">
 <meta name="theme-color" content="#121212">
 <link rel="icon" href="/landing/img/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#121212;--bone:#EDE8DF;--studio:#E8E2D8;--tile:#E2DCD1;--concrete:#CFCAC1;--smoke:#5E5B57;--red:#C8322B;--green:#0F5A36;--gold:#F2B33D;--blue:#1B2D7A;--vapour:#9FC3D9;
---display:'Anton','Arial Narrow',Impact,sans-serif;--mono:'Space Mono',ui-monospace,monospace;--body:'Source Sans 3',system-ui,sans-serif;--pad:clamp(16px,4vw,56px)}
+:root{
+  --ink:#121212;--ink2:#1D1C1B;--bone:#EDE8DF;--bone2:#E2DCD1;--smoke:#5E5B57;--pale:#CFCAC1;
+  --red:#C8322B;--green:#0F5A36;--gold:#F2B33D;--blue:#1B2D7A;
+  --display:'Anton','Arial Narrow',Impact,sans-serif;--text:'Source Sans 3',system-ui,sans-serif;
+  --m:clamp(16px,2.6vw,40px);              /* the one pair of page margins */
+  --gap:clamp(120px,14vw,220px);           /* between sections */
+  --xl:clamp(64px,10.4vw,170px);           /* step 1: hero lines */
+  --l:clamp(46px,6.4vw,104px);             /* step 2: section headings */
+  --mid:clamp(24px,2.2vw,32px);            /* step 3: statements, row names */
+  --body:clamp(17px,1.25vw,19px);          /* step 4 */
+  --small:16px;                            /* step 5 */
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:var(--bone);color:var(--ink);font-family:var(--body);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{background:var(--bone);color:var(--ink);font:400 var(--body)/1.55 var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
-.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--smoke)}
-.display{font-family:var(--display);text-transform:uppercase;font-weight:400;line-height:.92;letter-spacing:.005em}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:0 26px;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--ink);transition:transform .2s,background .2s,color .2s}
-.btn:hover{transform:translateY(-2px)}
-.btn-dark{background:var(--ink);color:var(--bone)}
-.btn-gold{background:var(--gold);border-color:var(--gold);color:var(--ink)}
-.btn-ghost{background:transparent}
-.btn-light{background:var(--bone);border-color:var(--bone);color:var(--ink)}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-transform:uppercase;line-height:.92;letter-spacing:-.01em}
 :focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 26px;font:700 var(--body)/1 var(--text);background:var(--gold);color:var(--ink);transition:transform .2s var(--ease),background .2s}
+.btn:hover{transform:translateY(-2px);background:#FFC352}
+.btn:active{transform:translateY(0) scale(.98)}
+.btn.dark{background:var(--ink);color:var(--bone)}
+.btn.dark:hover{background:#2A2928}
+.tlink{font-weight:700;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px;transition:color .2s}
+.tlink:hover{color:var(--red)}
 
-/* 3D stage */
+/* 3D logo canvas sits between section grounds (z0) and section content (z2) */
 #stage{position:fixed;inset:0;z-index:1;pointer-events:none}
 #stage canvas{width:100%!important;height:100%!important;display:block}
 #fallback{position:fixed;right:6vw;top:22vh;width:min(38vw,420px);z-index:1;display:none}
-main{position:relative}
-header,footer{position:relative;z-index:2}
-/* layering: dark section backgrounds (z0) < 3D button (z1) < content (z2) */
-section{position:relative}
-section>.wrap,.hero-copy,.scrollhint,.marquee,.flag{position:relative;z-index:2}
-.drops,.final{background:none!important}
-.drops::before,.final::before{content:'';position:absolute;inset:0;background:var(--ink);z-index:0}
+section,footer{position:relative}
+/* grounds paint below the fixed canvas; content is lifted above it */
+.ground{background:var(--g)}
+.ground>*,.z{position:relative;z-index:2}
+/* every piece of content sits above the travelling logo */
+section :is(h1,h2,h3,p,a,button,ul,ol,figure){position:relative;z-index:2}
+section p{max-width:62ch}
+.slot{pointer-events:none;aspect-ratio:1497/1401}
 
-/* nav */
-.nav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:14px var(--pad);transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
-.nav.solid{background:rgba(237,232,223,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-color:var(--ink)}
-.brand{display:flex;align-items:center;gap:10px}
+/* nav: wordmark, four links, one action */
+.nav{position:fixed;top:0;left:0;right:0;z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px var(--m);color:var(--bone);transition:background .3s,color .3s}
+.nav.solid{background:var(--bone);color:var(--ink)}
+.brand{display:flex;align-items:center;gap:10px;font:400 24px/1 var(--display);text-transform:uppercase}
 .brand img{width:40px;height:38px;object-fit:contain}
-.brand span{font-family:var(--display);font-size:22px;text-transform:uppercase}
-.brand b{color:var(--red);font-weight:400}
-.nav ul{display:flex;gap:28px;list-style:none}
-.nav ul a{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
-.nav ul a:hover{color:var(--red)}
-.nav .btn{min-height:44px;padding:0 18px;font-size:12px}
-@media(max-width:820px){.nav ul{display:none}}
+.nav ul{display:flex;gap:30px;list-style:none;font-weight:600;font-size:var(--body)}
+.nav ul a{transition:color .2s}.nav ul a:hover{color:var(--gold)}
+.nav.solid ul a:hover{color:var(--red)}
+.nav .btn{justify-self:end;min-height:44px;padding:0 20px}
+@media(max-width:860px){.nav{grid-template-columns:1fr auto}.nav ul{display:none}}
 
-/* hero */
-.hero{min-height:100svh;display:grid;align-items:center;padding:110px var(--pad) 60px}
-.hero-copy{max-width:min(620px,52vw);display:flex;flex-direction:column;gap:22px}
-.hero h1{font-size:clamp(64px,10.5vw,168px)}
-.hero h1 em{font-style:normal;color:var(--red)}
-.hero p{font-size:clamp(17px,1.4vw,20px);line-height:1.55;color:var(--smoke);max-width:44ch}
-.hero .ctas{display:flex;flex-wrap:wrap;gap:12px}
-.scrollhint{position:absolute;left:var(--pad);bottom:24px;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke);display:flex;align-items:center;gap:10px}
-.scrollhint i{display:block;width:1px;height:38px;background:var(--ink);animation:drip 1.8s ease-in-out infinite;transform-origin:top}
-@keyframes drip{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(0);transform-origin:bottom}}
-.flag{display:flex;height:6px}.flag i{flex:1}
-@media(max-width:820px){
- .hero{align-items:start;padding-top:96px}
- .hero-copy{max-width:100%;margin-top:min(56vh,440px)}
- .hero h1{font-size:clamp(56px,17vw,96px)}
+/* hero: the object splits the headline */
+.hero{--g:var(--ink);color:var(--bone);height:100svh;min-height:640px;overflow:hidden;padding:0 var(--m)}
+.hero h1{position:absolute;left:var(--m);right:var(--m);top:0;bottom:0;font-size:var(--xl);text-align:center;pointer-events:none}
+.hero h1 span{position:absolute;left:0;right:0}
+.hero h1 .l1{top:calc(19svh)}
+.hero h1 .l2{bottom:calc(4svh)}
+.hero .side{position:absolute;left:var(--m);right:var(--m);top:60svh;transform:translateY(-50%);display:flex;justify-content:space-between;align-items:center;gap:24px;font-size:var(--small);line-height:1.45;pointer-events:none}
+.hero .side>*{pointer-events:auto}
+.hero .side p{max-width:22ch}
+.hero .side .facts{text-align:right}
+.hero .side b{display:block;font:400 var(--mid)/1 var(--display);text-transform:uppercase;margin-bottom:6px}
+.slot-hero{position:absolute;left:50%;top:18svh;height:86svh;transform:translateX(-50%)}
+@media(max-width:760px){
+  .hero h1{font-size:clamp(52px,15vw,96px)}
+  .hero h1 .l1{top:31svh}
+  .hero h1 .l2{bottom:6svh}
+  .hero .side{top:84px;transform:none;display:block}
+  .hero .side p{max-width:none;font-size:var(--small)}
+  .hero .side .facts{display:none}
+  .slot-hero{top:30svh;height:62svh;width:auto}
 }
 
-/* marquee */
-.marquee{background:var(--gold);border-block:1px solid var(--ink);overflow:hidden;white-space:nowrap;padding:14px 0}
-.marquee div{display:inline-block;font-family:var(--display);font-size:clamp(22px,2.6vw,32px);text-transform:uppercase;animation:mq 34s linear infinite}
-.marquee span{margin:0 26px;color:var(--red)}
-@keyframes mq{to{transform:translateX(-50%)}}
+/* about: inset panel, the photograph cut into a button */
+.about{padding:24px 20px 20px}
+.panel{background:var(--green);color:var(--bone);min-height:100svh;overflow:hidden;display:grid;grid-template-columns:repeat(12,1fr);column-gap:24px;padding:56px}
+.panel>*{position:relative;z-index:2}
+.panel h2{grid-column:1/7;grid-row:1;font-size:var(--l);align-self:start}
+.panel .buttonphoto{grid-column:1/7;grid-row:2;align-self:end;width:min(38vw,560px);aspect-ratio:1;margin:64px 0 calc(-56px - 8vw);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M50 0a50 50 0 1 1 0 100A50 50 0 1 1 50 0ZM39 36.5a6.5 6.5 0 1 0 0 .1ZM61 36.5a6.5 6.5 0 1 0 0 .1ZM39 63.5a6.5 6.5 0 1 0 0 .1ZM61 63.5a6.5 6.5 0 1 0 0 .1Z'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M50 0a50 50 0 1 1 0 100A50 50 0 1 1 50 0ZM39 36.5a6.5 6.5 0 1 0 0 .1ZM61 36.5a6.5 6.5 0 1 0 0 .1ZM39 63.5a6.5 6.5 0 1 0 0 .1ZM61 63.5a6.5 6.5 0 1 0 0 .1Z'/%3E%3C/svg%3E") center/contain no-repeat}
+.panel .buttonphoto img{width:100%;height:100%;object-fit:cover;transform:scale(1.12);transition:transform 1.6s var(--ease)}
+.panel .buttonphoto.in img{transform:scale(1)}
+.panel .slot{grid-column:7/9;grid-row:1/3;align-self:center;width:100%}
+.panel .text{grid-column:9/13;grid-row:1/3;display:flex;flex-direction:column;gap:56px;align-self:stretch;padding-top:8px}
+.panel .text .btn{margin-top:auto}
+.panel h3{font:700 var(--mid)/1.15 var(--text);text-transform:none;letter-spacing:0;margin-bottom:10px}
+.panel .text p{font-size:var(--body)}
+.panel .streets{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px}
+.panel .streets a{font-weight:700;text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(237,232,223,.4)}
+.panel .streets a:hover{text-decoration-color:var(--gold);color:var(--gold)}
+.panel .btn{align-self:flex-start}
+@media(max-width:860px){
+  .about{padding:10px}
+  .panel{display:flex;flex-direction:column;gap:40px;padding:28px 20px 0;min-height:0}
+  .panel h2{font-size:clamp(44px,12vw,72px)}
+  .panel .slot{display:none}
+  .panel .text{gap:36px}
+  .panel .text .btn{margin-top:0}
+  .panel .buttonphoto{width:86vw;max-width:520px;align-self:center;margin:8px 0 -22vw}
+}
 
-/* sections */
-section.block{padding:clamp(80px,12vw,160px) var(--pad);min-height:90vh;display:flex;align-items:center}
-.wrap{width:100%;max-width:1360px;margin:0 auto}
-.split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,80px);align-items:center}
-.split.right .copy{grid-column:2}
-.copy{display:flex;flex-direction:column;gap:20px}
-.copy h2{font-size:clamp(46px,6.4vw,104px)}
-.copy p{font-size:clamp(17px,1.3vw,19px);line-height:1.6;color:var(--smoke);max-width:46ch}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ink);margin-top:12px}
-.stats div{padding:16px 12px 0 0}
-.stats b{display:block;font-family:var(--display);font-size:clamp(30px,3.4vw,48px);font-weight:400}
-.stats span{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--smoke)}
-@media(max-width:820px){.split{grid-template-columns:1fr}.split.right .copy{grid-column:1}.stats{grid-template-columns:repeat(2,1fr)}.stats div{padding-bottom:12px}}
+/* showcase: one frame, three distances */
+.show{height:300vh;margin-top:var(--gap)}
+.show .stage{position:sticky;top:0;height:100svh;display:grid;grid-template-columns:1fr 30vw 1fr;grid-template-rows:1fr auto auto 1fr;column-gap:4vw;align-items:center;padding:72px var(--m) 24px;z-index:2}
+.show h2{display:contents}
+.show h2 span{grid-column:1/4;text-align:center;font-size:var(--l);position:relative;z-index:3}
+.show .h1{grid-row:1;align-self:end;margin-bottom:.12em}
+.show .h2{grid-row:3;align-self:start;margin-top:.12em;opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.show[data-s="2"] .h2,.show[data-s="3"] .h2{opacity:1;transform:none}
+.show .frame{grid-column:2;grid-row:2;aspect-ratio:4/5;overflow:hidden;background:var(--bone2)}
+.show .frame img{width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease);transform-origin:50% 40%}
+.show[data-s="2"] .frame img{transform:scale(1.8);transform-origin:42% 36%}
+.show[data-s="3"] .frame img{transform:scale(3.2);transform-origin:22% 52%}
+.show .cap{grid-column:3;grid-row:2;align-self:start;max-width:28ch;font-size:var(--body);opacity:0;transform:translateY(20px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.show[data-s="3"] .cap{opacity:1;transform:none}
+.show .cap b{display:block;font:400 var(--mid)/1 var(--display);text-transform:uppercase;margin-bottom:10px}
+.show .cap .tlink{display:inline-block;margin-top:14px}
+.show .slot{grid-column:1;grid-row:2;width:min(16vw,230px);justify-self:end}
+@media(max-width:760px){
+  .show .stage{grid-template-columns:1fr;grid-template-rows:auto auto auto auto;align-content:center;row-gap:8px}
+  .show h2 span{grid-column:1;font-size:13vw}
+  .show .h1{grid-row:1}.show .h2{grid-row:3}
+  .show .frame{grid-column:1;grid-row:2;width:70vw;justify-self:center}
+  .show .cap{grid-column:1;grid-row:4;text-align:center;justify-self:center;font-size:16px}
+  .show .slot{display:none}
+}
 
-.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:32px;flex-wrap:wrap}
-.head h2{font-size:clamp(46px,6.4vw,104px)}
-.link{font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;border-bottom:1px solid currentColor;padding-bottom:4px}
-.link:hover{color:var(--red)}
+/* how it becomes drip: tiles that grow */
+.grow{padding:var(--gap) var(--m) 0}
+.grow .grid{display:grid;grid-template-columns:repeat(12,1fr);column-gap:10px;align-items:end}
+.grow h2{grid-column:1/8;grid-row:1;align-self:start;font-size:var(--l)}
+.grow .slot{grid-column:5/8;grid-row:1;align-self:start;justify-self:center;width:min(14vw,200px);margin-top:4px}
+.tile{grid-row:2;overflow:hidden}
+.tile img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
+.tile:hover img{transform:scale(1.04)}
+.t1{grid-column:1/4;height:30vh;background:var(--gold)}
+.t2{grid-column:4/8;height:44vh;background:var(--red)}
+.t3{grid-column:8/13;grid-row:1/3;height:60vh;background:var(--blue)}
+.stagecap{grid-row:3;padding-top:16px;max-width:34ch}
+.stagecap h3{font:700 var(--body)/1.2 var(--text);text-transform:none;letter-spacing:0;margin-bottom:4px}
+.stagecap p{font-size:var(--small)}
+.c1{grid-column:1/4}.c2{grid-column:4/8}.c3{grid-column:8/13}
+@media(max-width:760px){
+  .grow .grid{display:flex;flex-direction:column;align-items:stretch;gap:0}
+  .grow h2{margin-bottom:28px}
+  .grow .slot{display:none}
+  .t1{height:34vw}.t2{height:46vw;margin-top:28px}.t3{height:62vw;margin-top:28px}
+  .tile{order:var(--o)}.stagecap{order:var(--o);max-width:none}
+}
 
-/* products */
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.card{display:flex;flex-direction:column;gap:10px}
-.card .ph{aspect-ratio:4/5;background:var(--tile);overflow:hidden;position:relative}
-.card .ph img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
-.card:hover .ph img{transform:scale(1.05)}
-.badge{position:absolute;top:10px;left:10px;background:var(--ink);color:var(--bone);font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:5px 8px}
-.card .meta{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--smoke)}
-.card .t{font-family:var(--display);font-size:20px;line-height:1.05;text-transform:uppercase}
-.card .p{font-family:var(--mono);font-weight:700;font-size:13px}
-@media(max-width:980px){.cards{grid-template-columns:repeat(2,1fr)}}
+/* route one: the button rides down the schedule */
+.route{--g:var(--ink);color:var(--bone);margin-top:120px;padding:120px var(--m) 120px}
+.route .top{display:grid;grid-template-columns:1fr 22% 1fr;align-items:center;min-height:min(56vh,520px)}
+.route .top .slot{grid-column:2;grid-row:1;width:100%}
+.route h2{display:contents}
+.route h2 span{font-size:var(--l)}
+.route h2 .w1{grid-column:1;text-align:right}
+.route h2 .w2{grid-column:3}
+.route .intro{text-align:center;max-width:52ch;margin:16px auto 56px}
+.list{position:relative;z-index:auto}
+.route .rail{position:absolute;left:50%;top:0;bottom:0;width:22%;transform:translateX(-50%);z-index:1}
+.route .rail .slot{position:sticky;top:calc(50svh - 11vw);width:100%}
+/* row grounds stay under the riding logo; their words stay above it */
+.route .rows{list-style:none;position:static}
+.rows .when{position:relative;z-index:2}
+.rows li{display:grid;grid-template-columns:minmax(0,38%) 1fr minmax(0,24%);align-items:baseline;padding:22px 24px;background:var(--ink)}
+.rows li:nth-child(even){background:var(--ink2)}
+.rows li.next{background:var(--gold);color:var(--ink)}
+.rows h3{font-size:var(--mid);line-height:1}
+.rows p{font-size:var(--small);margin-top:8px;max-width:46ch}
+.rows .next p{color:var(--ink)}
+.rows .when{grid-column:3;text-align:right;font-size:var(--small);font-weight:700}
+@media(max-width:760px){
+  .route .top{grid-template-columns:1fr;min-height:0;gap:8px}
+  .route h2 span,.route h2 .w1,.route h2 .w2{grid-column:1;text-align:left;font-size:13vw}
+  .route .intro{grid-column:1;text-align:left;margin:16px 0 32px}
+  .route .rail,.route .top .slot{display:none}
+  .rows li{grid-template-columns:1fr;padding:18px 16px}
+  .rows .when{grid-column:1;text-align:left;margin-top:8px}
+}
 
-/* collections */
-.streets{border-top:1px solid var(--ink)}
-.street{display:grid;grid-template-columns:70px 1fr auto;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid var(--ink);transition:padding .3s,background .3s}
-.street:hover{padding-left:14px;background:rgba(18,18,18,.04)}
-.street .n{font-family:var(--mono);font-size:12px;color:var(--smoke)}
-.street h3{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(30px,3.8vw,58px);line-height:1;white-space:nowrap}
-.street p{font-size:15px;color:var(--smoke);max-width:30ch;text-align:right}
-.street .dot{display:inline-block;width:.42em;height:.42em;border-radius:50%;margin-left:.25em;vertical-align:.12em}
-@media(max-width:700px){.street{grid-template-columns:44px 1fr}.street p{grid-column:2;text-align:left}}
+/* the one deliberate rest: Durban at night */
+.night{height:110svh;overflow:hidden;color:var(--bone)}
+.night img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;transform:scale(1.15);transition:transform 6s linear}
+.night.in img{transform:scale(1)}
+.night .z{position:absolute;left:var(--m);bottom:40px;right:var(--m);display:flex;justify-content:space-between;align-items:end;gap:20px}
+.night h2{font-size:var(--l)}
+.night p{font-size:var(--small);max-width:30ch;text-align:right}
+.night img{object-position:50% 70%}
+@media(max-width:760px){.night .z{flex-direction:column;align-items:flex-start}.night h2{font-size:13vw}.night p{text-align:left}}
 
-/* drops */
-.drops{background:var(--ink);color:var(--bone)}
-.drops .eyebrow{color:var(--vapour)}
-.drops .copy p{color:var(--concrete)}
-.weeks{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#2E2C2A;border:1px solid #2E2C2A;margin-top:40px}
-.week{background:var(--ink);padding:26px 22px;min-height:220px;display:flex;flex-direction:column;gap:12px;transition:background .3s}
-.week:hover{background:#1C1C1C}
-.week .no{font-family:var(--mono);font-size:12px;color:var(--gold);letter-spacing:.14em}
-.week h3{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(30px,3vw,44px);line-height:1}
-.week p{font-size:15px;line-height:1.5;color:var(--concrete)}
-.week .tag{margin-top:auto;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--washed,#8C8A85)}
-@media(max-width:900px){.weeks{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){.weeks{grid-template-columns:1fr}}
+/* where you headed: the live thing */
+.headed{padding:var(--gap) var(--m) 0}
+.headed .grid{display:grid;grid-template-columns:repeat(12,1fr);column-gap:24px;row-gap:40px}
+.headed h2{grid-column:1/8;font-size:var(--l)}
+.headed .slot{grid-column:10/13;justify-self:end;width:min(14vw,200px)}
+.headed .lead{grid-column:1/6;font-size:var(--body)}
+.boards{grid-column:1/6;display:flex;flex-direction:column;gap:10px}
+.board{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;min-height:72px;padding:14px 20px;background:var(--bone2);border:0;font:400 var(--mid)/1 var(--display);text-transform:uppercase;text-align:left;color:var(--ink);cursor:pointer;transition:background .2s,color .2s,transform .2s var(--ease)}
+.board small{font:600 var(--small)/1.3 var(--text);text-transform:none;color:var(--smoke);text-align:right}
+.board:hover{transform:translateX(6px)}
+.board[aria-pressed="true"]{background:var(--ink);color:var(--bone)}
+.board[aria-pressed="true"] small{color:var(--gold)}
+.lookcard{grid-column:6/13;grid-row:2/4;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:end}
+.lookcard figure{aspect-ratio:4/5;overflow:hidden;background:var(--bone2)}
+.lookcard figure img{width:100%;height:100%;object-fit:cover;animation:lookin .5s var(--ease)}
+@keyframes lookin{from{opacity:.2;transform:scale(1.04)}to{opacity:1;transform:none}}
+.lookcard h3{font-size:var(--mid);margin-bottom:14px}
+.lookcard ul{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:var(--small);margin-bottom:16px}
+.lookcard li{display:flex;justify-content:space-between;gap:12px}
+.lookcard li span:last-child{font-weight:700;white-space:nowrap}
+.lookcard .total{position:relative;z-index:2;display:flex;justify-content:space-between;font:700 var(--body)/1.2 var(--text);margin:6px 0 18px;background:var(--bone2);padding:14px}
+.no-js .lookcard,.no-js .boards{display:none}
+.alllooks{display:none}
+.no-js .alllooks{display:grid;grid-column:1/13;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:860px){
+  .headed .grid{display:flex;flex-direction:column;gap:20px}
+  .headed .slot{display:none}
+  .lookcard{grid-template-columns:1fr;gap:16px}
+  .board{min-height:84px}
+  .lookcard figure{aspect-ratio:4/4.4}
+}
 
-/* looks */
-.looks{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.look{position:relative;aspect-ratio:4/5;overflow:hidden;background:var(--studio)}
-.look img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
-.look:hover img{transform:scale(1.04)}
-.look span{position:absolute;left:12px;bottom:12px;background:var(--ink);color:var(--bone);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:7px 10px}
-@media(max-width:980px){.looks{grid-template-columns:repeat(2,1fr)}}
+/* the whole rack: small frames, wide space */
+.rack{margin-top:var(--gap);position:relative}
+.rack .head{display:flex;justify-content:space-between;align-items:end;padding:0 var(--m);margin-bottom:20px}
+.rack .slot{width:min(12vw,180px)}
+.rack h2{font:700 var(--body)/1.2 var(--text);text-transform:none;letter-spacing:0;position:relative;z-index:3}
+.strip{display:flex;gap:5vw;overflow-x:auto;padding:0 var(--m) 20px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.strip a{flex:none;width:11vw;min-width:140px;height:24svh;min-height:200px;overflow:hidden;scroll-snap-align:start;background:var(--bone2)}
+.strip img{width:100%;height:100%;object-fit:cover;transition:transform .25s var(--ease)}
+.strip a:hover img,.strip a:focus-visible img{transform:scale(1.1)}
+@media(max-width:760px){.rack .slot{display:none}.strip a{width:34vw;min-width:0;height:51vw}.rack h2{margin-bottom:20px}}
 
-/* final */
-.final{background:var(--ink);color:var(--bone);min-height:100svh;display:flex;align-items:center;text-align:center;padding:120px var(--pad)}
-.final .wrap{display:flex;flex-direction:column;align-items:center;gap:22px}
-.final h2{font-size:clamp(60px,9vw,150px)}
-.final h2 em{font-style:normal;color:var(--gold)}
-.final p{color:var(--concrete);font-size:18px;max-width:40ch;line-height:1.55}
-.final .spacer{height:min(34vh,300px)}
-footer{background:var(--ink);color:var(--concrete);padding:28px var(--pad) 36px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;border-top:1px solid #2E2C2A}
-footer a:hover{color:var(--gold)}
+/* the object returns */
+.final{--g:var(--ink);color:var(--bone);min-height:90svh;margin-top:var(--gap);overflow:hidden;display:grid;grid-template-columns:repeat(12,1fr);column-gap:24px;align-items:center;padding:80px var(--m)}
+.final .slot{position:absolute;left:-10vw;top:50%;transform:translateY(-44%);height:104svh}
+.final .copy{grid-column:9/13;display:flex;flex-direction:column;gap:18px}
+.final h2{font-size:var(--mid);line-height:1}
+.final p{font-size:var(--body)}
+.final .fact{font:400 var(--mid)/1.1 var(--display);text-transform:uppercase;color:var(--bone)}
+.final .btn{align-self:flex-start}
+@media(max-width:760px){
+  .final{display:flex;flex-direction:column;align-items:stretch;padding:72px var(--m) 0;min-height:0}
+  .final .copy{order:1}.final .btn{align-self:stretch}
+  .final .slot{position:relative;left:auto;top:auto;bottom:auto;transform:none;height:auto;width:130vw;margin:24px 0 -20vw -18vw;order:2}
+}
 
-/* reveal */
-.rv{opacity:0;transform:translateY(40px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+/* footer: the back of the postcard */
+footer{--g:var(--ink);padding:24px var(--m) 72px;color:var(--ink)}
+.card{max-width:1200px;margin:0 auto;background:var(--bone);display:grid;grid-template-columns:1fr 1fr;gap:40px;padding:80px 56px 32px;position:relative;z-index:2}
+.card::after{content:'';position:absolute;left:0;right:0;top:-1px;height:51px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50'%3E%3Ccircle cx='50' cy='0' r='50' fill='%23121212'/%3E%3C/svg%3E") 0 0/100px 50px repeat-x}
+.card h2{font-size:var(--l);margin-bottom:14px}
+.card .msg p{font-size:var(--body);max-width:42ch}
+.card .addr{display:flex;flex-direction:column;gap:12px;font-size:var(--body);padding-top:96px}
+.card .addr a{font-weight:600;transition:color .2s}.card .addr a:hover{color:var(--red)}
+.stamp{position:absolute;top:56px;right:56px;width:88px;padding:6px;background:var(--bone);outline:2px dashed var(--pale);outline-offset:-1px}
+.stamp img{aspect-ratio:3/4;object-fit:cover;width:100%}
+.imprint{grid-column:1/3;text-align:center;font-size:13px;color:var(--smoke);line-height:1.6;max-width:70ch;margin:0 auto}
+.imprint a{text-decoration:underline;text-underline-offset:3px}
+@media(max-width:760px){
+  .card{grid-template-columns:1fr;padding:64px 20px 24px}
+  .card::after{background-size:16.66vw 8.33vw;height:8.33vw}
+  .card .addr{padding-top:0;font-size:17px}
+  .stamp{width:64px;top:48px;right:20px}
+  .imprint{grid-column:1}
+}
+
+/* entrances: parts of each section rise in turn */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease),transform .8s var(--ease);transition-delay:calc(var(--i,0) * 80ms)}
 .rv.in{opacity:1;transform:none}
 .no-js .rv,.reduced .rv{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){.marquee div,.scrollhint i{animation:none}}
-
-/* slots: empty spaces in the layout where the 3D logo parks */
-.slot{pointer-events:none;aspect-ratio:1497/1401;width:100%}
-.hero{position:relative}
-.slot-hero{position:absolute;right:var(--pad);top:50%;transform:translateY(-46%);width:min(42vw,620px)}
-.slot-col{max-width:540px;justify-self:center}
-.split.right .slot-col{grid-column:1;grid-row:1}.split.right .copy{grid-column:2;grid-row:1}
-.slot-sm{width:clamp(110px,13vw,190px);flex:none}
-.final .slot{width:min(34vh,300px);height:auto;margin:0 auto}
-@media(max-width:820px){
- .slot-hero{left:50%;right:auto;top:84px;transform:translateX(-50%);width:min(82vw,46svh)}
- .slot-col{width:56vw;justify-self:start}
- #streets .slot-col{display:none}
- .split.right .copy{grid-column:1;grid-row:2}
- .slot-sm{width:92px}
- .head{flex-wrap:nowrap;align-items:center}
- .head .link{display:none}
+@media (prefers-reduced-motion:reduce){
+  .rv,.show .h2,.show .cap{opacity:1!important;transform:none!important;transition:none}
+  .show .frame img,.night img,.panel .buttonphoto img{transition:none;transform:none!important}
+  .lookcard figure img{animation:none}
 }
 </style>
 </head>
@@ -183,138 +302,179 @@ footer a:hover{color:var(--gold)}
 <img id="fallback" src="/landing/img/logo.png" alt="">
 
 <header class="nav" id="nav">
-  <a class="brand" href="/" aria-label="Crazy Button SA home"><img src="/landing/img/logo.png" alt=""><span>Crazy Button <b>SA</b></span></a>
+  <a class="brand" href="/" aria-label="Crazy Button SA home"><img src="/landing/img/logo.png" alt=""><span>Crazy Button SA</span></a>
   <ul>
     <li><a href="#story">Story</a></li>
     <li><a href="#fresh">New in</a></li>
-    <li><a href="#drops">Six drops</a></li>
-    <li><a href="#looks">Looks</a></li>
+    <li><a href="#route">Six drops</a></li>
+    <li><a href="#headed">Looks</a></li>
   </ul>
-  <a class="btn btn-dark" href="/shop/">Shop</a>
+  <a class="btn" href="/shop/">Shop</a>
 </header>
 
 <main>
-  <section class="hero" data-key="0">
-    <div class="hero-copy">
-      <div class="eyebrow rv">Est. 2011 · Kwa Mashu × Umlazi · Durban</div>
-      <h1 class="display rv">Wear loud.<br><em>Walk proud.</em></h1>
-      <p class="rv">Mzansi’s loudest streetwear. Every piece starts with one button and a story from the block, stitched for the brave and rocked worldwide.</p>
-      <div class="ctas rv">
-        <a class="btn btn-dark" href="/shop/">Shop the drop</a>
-        <a class="btn btn-ghost" href="#drops">Six weeks, six drops</a>
-      </div>
+  <section class="hero ground" id="top" data-dark>
+    <h1><span class="l1 rv">Wear loud.</span><span class="l2 rv" style="--i:2">Walk proud.</span></h1>
+    <div class="side">
+      <p class="rv" style="--i:3">Crazy Button SA is streetwear from KwaMashu, Umlazi and Durban, stitched in flag colours since 2011.</p>
+      <div class="facts rv" style="--i:4"><b>Est. 2011</b>33 pieces, from R349<br><a class="tlink" href="/shop/">Shop the drop</a></div>
     </div>
-    <div class="scrollhint"><i></i>Scroll</div>
     <div class="slot slot-hero" data-slot="0" aria-hidden="true"></div>
   </section>
-  <div class="flag" aria-hidden="true"><i style="background:var(--green)"></i><i style="background:var(--gold)"></i><i style="background:var(--ink)"></i><i style="background:var(--red)"></i><i style="background:var(--blue)"></i><i style="background:var(--bone)"></i></div>
-  <div class="marquee" aria-label="Wear loud. Walk proud. For the brave, from the block. Mzansi made, globally played."><div>
-    Wear loud. Walk proud.<span>●</span>For the brave. From the block.<span>●</span>Mzansi made, globally played.<span>●</span>No chill, all drip.<span>●</span>Culture in every stitch.<span>●</span>
-    Wear loud. Walk proud.<span>●</span>For the brave. From the block.<span>●</span>Mzansi made, globally played.<span>●</span>No chill, all drip.<span>●</span>Culture in every stitch.<span>●</span>
-  </div></div>
 
-  <section class="block" id="story" data-key="1">
-    <div class="wrap split right">
-      <div class="slot slot-col" data-slot="1" aria-hidden="true"></div>
-      <div class="copy">
-        <div class="eyebrow rv">01 — The button</div>
-        <h2 class="display rv">One button.<br>Fifteen years<br>of drip.</h2>
-        <p class="rv">Crazy Button started in 2011 with a needle, a thread and a point to prove. Four holes, flag colours, no shortcuts. Today it carries the streets of Kwa Mashu and Umlazi from Durban to the world.</p>
-        <div class="stats rv">
-          <div><b>2011</b><span>Established</span></div>
-          <div><b>6</b><span>Collections</span></div>
-          <div><b>33</b><span>Pieces</span></div>
-          <div><b>12</b><span>Patches</span></div>
+  <section class="about" id="story">
+    <div class="panel" data-dark>
+      <h2 class="rv">One button.<br>Since 2011.</h2>
+      <div class="buttonphoto rv" style="--i:1"><img src="/landing/img/world/umlazi-hills.webp" width="1200" height="900" alt="The hills of Umlazi, Durban, seen from the road" loading="lazy"></div>
+      <div class="slot" data-slot="1" aria-hidden="true"></div>
+      <div class="text">
+        <div class="rv" style="--i:2">
+          <h3>Born on two streets</h3>
+          <p>Crazy Button started in KwaMashu and Umlazi with a needle, a thread and a point to prove. Four holes, flag colours, no shortcuts. Fifteen years later it carries Durban to the world.</p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="block" id="fresh" data-key="2">
-    <div class="wrap">
-      <div class="head">
-        <div class="copy"><div class="eyebrow rv">02 — New arrivals</div><h2 class="display rv">Fresh off<br>the needle</h2></div>
-        <div class="slot slot-sm" data-slot="2" aria-hidden="true"></div>
-        <a class="link rv" href="/shop/catalog">View all 33 pieces →</a>
-      </div>
-      <div class="cards">
-        <a class="card rv" href="/shop/product/craziest-threads-varsity"><div class="ph"><img src="/landing/img/varsity.webp" alt="Craziest Threads varsity jacket" loading="lazy"><span class="badge">New</span></div><div class="meta">Core Range · Jackets</div><div class="t">Craziest Threads Varsity</div><div class="p">R3,599</div></a>
-        <a class="card rv" href="/shop/product/kwa-mashu-bomber"><div class="ph"><img src="/landing/img/bomber.webp" alt="Kwa Mashu To The World bomber" loading="lazy"><span class="badge">Limited</span></div><div class="meta">Zulu Future · Jackets</div><div class="t">Kwa Mashu To The World Bomber</div><div class="p">R3,199</div></a>
-        <a class="card rv" href="/shop/product/umlazi-unit-hoodie"><div class="ph"><img src="/landing/img/hoodie.webp" alt="Umlazi Unit hoodie" loading="lazy"><span class="badge">Hero</span></div><div class="meta">Core Range · Hoodies</div><div class="t">Umlazi Unit Hoodie</div><div class="p">R2,449</div></a>
-        <a class="card rv" href="/shop/product/spaza-bucket"><div class="ph"><img src="/landing/img/spaza.webp" alt="Spaza bucket hat" loading="lazy"><span class="badge">New</span></div><div class="meta">Spaza Drip · Hats</div><div class="t">Spaza Bucket Hat</div><div class="p">R1,449</div></a>
-      </div>
-    </div>
-  </section>
-
-  <section class="block" id="streets" data-key="3">
-    <div class="wrap split">
-      <div class="copy">
-        <div class="eyebrow rv">03 — The collections</div>
-        <h2 class="display rv">Named after<br>the streets</h2>
-        <div class="streets rv">
-          <a class="street" href="/shop/catalog"><span class="n">01</span><h3>Spaza Drip<span class="dot" style="background:var(--gold)"></span></h3><p>Spaza shop colours and signage.</p></a>
-          <a class="street" href="/shop/catalog"><span class="n">02</span><h3>Zulu Future<span class="dot" style="background:var(--red)"></span></h3><p>Bold outerwear, bead accents.</p></a>
-          <a class="street" href="/shop/catalog"><span class="n">03</span><h3>Ekasi Royalty<span class="dot" style="background:var(--blue)"></span></h3><p>Americana meets township drip.</p></a>
-          <a class="street" href="/shop/catalog"><span class="n">04</span><h3>Thrift Flex<span class="dot" style="background:var(--green)"></span></h3><p>Grandpa knits, recycled wool.</p></a>
-          <a class="street" href="/shop/catalog"><span class="n">05</span><h3>Braam Nights<span class="dot" style="background:var(--vapour)"></span></h3><p>We move different.</p></a>
-          <a class="street" href="/shop/catalog"><span class="n">06</span><h3>Mama Said<span class="dot" style="background:var(--ink)"></span></h3><p>Wear something warm.</p></a>
+        <div class="rv" style="--i:3">
+          <h3>Six collections, named after the block</h3>
+          <p>Spaza shop signage, Zulu beadwork, grandpa knits and Braam nights, each turned into a drop.</p>
+          <div class="streets">
+            <a href="/shop/catalog">Spaza Drip</a><a href="/shop/catalog">Zulu Future</a><a href="/shop/catalog">Ekasi Royalty</a><a href="/shop/catalog">Thrift Flex</a><a href="/shop/catalog">Braam Nights</a><a href="/shop/catalog">Mama Said</a>
+          </div>
         </div>
-      </div>
-      <div class="slot slot-col" data-slot="3" aria-hidden="true"></div>
-    </div>
-  </section>
-
-  <section class="block drops" id="drops" data-key="4">
-    <div class="wrap">
-      <div class="head" style="align-items:center"><div class="copy">
-        <div class="eyebrow rv">04 — The calendar</div>
-        <h2 class="display rv">Six weeks.<br>Six drops.</h2>
-        <p class="rv">A new drop every week for six weeks, each built for a different crew. Limited runs, no re-ups.</p>
-      </div>
-        <div class="slot slot-sm" data-slot="4" aria-hidden="true"></div>
-      </div>
-      <div class="weeks">
-        <div class="week rv"><span class="no">Week 01</span><h3>No Re-Up</h3><p><strong style="color:var(--bone)">Because once it’s gone, it’s gone.</strong> Small runs, numbered pieces and a 24-hour cop window. For sneakerheads, resale kings and street flexers.</p><span class="tag">Limited drop</span></div>
-        <div class="week rv"><span class="no">Week 02</span><h3>Raw Threads</h3><p><strong style="color:var(--bone)">No filter, no polish, just steeze.</strong> Heavy denim, beatable tees and jackets that get better with every scuff.</p><span class="tag">Core drop</span></div>
-        <div class="week rv"><span class="no">Week 03</span><h3>Lowkey Legend</h3><p><strong style="color:var(--bone)">Speak in style, not volume.</strong> Tonal, curated and quietly loud. For alt fashion, designers and underground creators.</p><span class="tag">Aesthetic drop</span></div>
-        <div class="week rv"><span class="no">Week 04</span><h3>Tunnel Flex</h3><p><strong style="color:var(--bone)">Built for tunnel walks.</strong> Off-court fits for on-point energy: clean lines, stretch and dry-tech.</p><span class="tag">Functional drop</span></div>
-        <div class="week rv"><span class="no">Week 05</span><h3>Choose Your Fit</h3><p><strong style="color:var(--bone)">You vote. We stitch.</strong> The community picks the next hoodie colour. The winning colourway drops to voters first.</p><span class="tag">Community vote</span></div>
-        <div class="week rv"><span class="no">Week 06</span><h3>Collab Week</h3><p><strong style="color:var(--bone)">Made with the culture, for the culture.</strong> A creator-designed cap or tee with young SA artists, dancers and gqom and amapiano producers.</p><span class="tag">Micro collab</span></div>
+        <a class="btn rv" style="--i:4" href="/shop/catalog">Shop all 33 pieces</a>
       </div>
     </div>
   </section>
 
-  <section class="block" id="looks" data-key="5">
-    <div class="wrap">
-      <div class="head">
-        <div class="copy"><div class="eyebrow rv">05 — Shop the look</div><h2 class="display rv">Wear it<br>like this</h2></div>
-        <div class="slot slot-sm" data-slot="5" aria-hidden="true"></div>
-        <a class="link rv" href="/shop/">Shop all looks →</a>
-      </div>
-      <div class="looks">
-        <a class="look rv" href="/shop/"><img src="/landing/img/look1.webp" alt="Kwa Mashu Nights look: bomber, track pants, bucket hat, patch" loading="lazy"><span>01 Kwa Mashu Nights</span></a>
-        <a class="look rv" href="/shop/"><img src="/landing/img/look2.webp" alt="Weekend Hustle look: tee, Spaza bucket, drawstring bag, luggage cover" loading="lazy"><span>02 Weekend Hustle</span></a>
-        <a class="look rv" href="/shop/"><img src="/landing/img/look3.webp" alt="Thrift Flex look: cardigan, Mama Said tee, Daylife bucket" loading="lazy"><span>03 Thrift Flex</span></a>
-        <a class="look rv" href="/shop/"><img src="/landing/img/look4.webp" alt="Craziest On The Block look: varsity, hoodie, gold bucket, luggage cover" loading="lazy"><span>04 Craziest On The Block</span></a>
-      </div>
+  <section class="show" id="fresh" data-s="1">
+    <div class="stage">
+      <h2><span class="h1">Fresh off</span><span class="h2">the needle</span></h2>
+      <div class="slot" data-slot="2" aria-hidden="true"></div>
+      <div class="frame"><img src="/landing/img/varsity.webp" alt="Craziest Threads varsity jacket in black wool with gold leather sleeves" loading="lazy"></div>
+      <div class="cap"><b>Craziest Threads Varsity</b>Black wool body, gold leather sleeves, a chenille CB and the shield and taxi patches. Craziest threads on the block. R3,599.<br><a class="tlink" href="/shop/product/craziest-threads-varsity">Shop the varsity</a></div>
     </div>
   </section>
 
-  <section class="final" id="final" data-key="6">
-    <div class="wrap">
-      <div class="eyebrow rv" style="color:var(--vapour)">Drop live · No re-up</div>
+  <section class="grow" id="made">
+    <div class="grid">
+      <h2 class="rv">How a button<br>becomes drip</h2>
+      <div class="slot" data-slot="3" aria-hidden="true"></div>
+      <a class="tile t1 rv" style="--o:1" href="/shop/product/patch-pack-vol-1"><img src="/landing/img/patches.webp" alt="Patch Drop Vol. 1, twelve iron-on patches" loading="lazy"></a>
+      <a class="tile t2 rv" style="--o:3;--i:1" href="/shop/product/umlazi-unit-hoodie"><img src="/landing/img/hoodie.webp" alt="Umlazi Unit hoodie in olive fleece with gold embroidered CB" loading="lazy"></a>
+      <a class="tile t3 rv" style="--o:5;--i:2" href="/shop/"><img src="/landing/img/look4.webp" alt="Craziest On The Block look: varsity, hoodie, gold bucket hat" loading="lazy"></a>
+      <div class="stagecap c1 rv" style="--o:2"><h3>Picked from the block</h3><p>Every piece starts with one button and a patch: a taxi rank, a spaza front, a word from gogo.</p></div>
+      <div class="stagecap c2 rv" style="--o:4;--i:1"><h3>Stitched loud</h3><p>Gold embroidered CB letters, flag-colour sleeve stripes and a leather cuff tab.</p></div>
+      <div class="stagecap c3 rv" style="--o:6;--i:2"><h3>Worn proud</h3><p>Rocked from Umlazi to the world, layered the way the streets wear it.</p></div>
+    </div>
+  </section>
+
+  <section class="route ground" id="route" data-dark>
+    <div class="top">
+      <h2><span class="w1 rv">Route</span><span class="w2 rv" style="--i:1">One</span></h2>
+      <div class="slot" data-slot="4" aria-hidden="true"></div>
+    </div>
+    <p class="intro rv">Six weeks, six drops, one route through the city. A new drop every week, each built for a different crew. Limited runs, no re-ups.</p>
+    <div class="list">
+    <div class="rail" aria-hidden="true"><div class="slot" data-slot="5"></div></div>
+    <ol class="rows">
+      <li class="next rv"><div><h3>No Re-Up</h3><p>Because once it’s gone, it’s gone. Small runs, numbered pieces and a 24-hour cop window.</p></div><span class="when">Week one · Limited drop</span></li>
+      <li class="rv"><div><h3>Raw Threads</h3><p>No filter, no polish, just steeze. Heavy denim, beatable tees, jackets that get better with every scuff.</p></div><span class="when">Week two · Core drop</span></li>
+      <li class="rv"><div><h3>Lowkey Legend</h3><p>Speak in style, not volume. Tonal, curated and quietly loud, for alt fashion and underground creators.</p></div><span class="when">Week three · Aesthetic drop</span></li>
+      <li class="rv"><div><h3>Tunnel Flex</h3><p>Built for tunnel walks. Off-court fits with clean lines, stretch and dry-tech.</p></div><span class="when">Week four · Functional drop</span></li>
+      <li class="rv"><div><h3>Choose Your Fit</h3><p>You vote, we stitch. The community picks the next hoodie colour and voters get it first.</p></div><span class="when">Week five · Community vote</span></li>
+      <li class="rv"><div><h3>Collab Week</h3><p>Made with the culture: a cap or tee designed with young SA artists, dancers and gqom and amapiano producers.</p></div><span class="when">Week six · Micro collab</span></li>
+    </ol>
+    </div>
+  </section>
+
+  <section class="night" id="durban">
+    <img src="/landing/img/world/durban-night.webp" width="1920" height="1264" alt="Durban's beachfront skyline lit up at night across the water" loading="lazy">
+    <div class="z">
+      <h2 class="rv">Durban,<br>after dark</h2>
+      <p class="rv" style="--i:1">The city every drop is cut for: the beachfront, the taxi ranks and the long way home.</p>
+    </div>
+  </section>
+
+  <section class="headed" id="headed">
+    <div class="grid">
+      <h2 class="rv">Where you<br>headed?</h2>
       <div class="slot" data-slot="6" aria-hidden="true"></div>
-      <h2 class="display rv">Cop it<br><em>before it’s gone.</em></h2>
-      <p class="rv">33 pieces, 12 patches, one button. Mzansi made, globally played.</p>
-      <a class="btn btn-gold rv" href="/shop/">Enter the shop</a>
+      <p class="lead rv">Pick where you are going and we will dress you for it, head to toe.</p>
+      <div class="boards rv" role="group" aria-label="Choose where you are headed">
+        <button class="board" type="button" aria-pressed="true" data-look="0">KwaMashu after dark<small>Kwa Mashu Nights</small></button>
+        <button class="board" type="button" aria-pressed="false" data-look="1">Out of town<small>Weekend Hustle</small></button>
+        <button class="board" type="button" aria-pressed="false" data-look="2">Sunday at gogo’s<small>Thrift Flex</small></button>
+        <button class="board" type="button" aria-pressed="false" data-look="3">The block, all day<small>Craziest On The Block</small></button>
+      </div>
+      <div class="lookcard" aria-live="polite">
+        <figure><img id="lookimg" src="/landing/img/look1.webp" alt="Kwa Mashu Nights look"></figure>
+        <div>
+          <h3 id="lookname">Kwa Mashu Nights</h3>
+          <ul id="lookitems"></ul>
+          <div class="total"><span>The full look</span><span id="looktotal"></span></div>
+          <a class="btn dark" id="lookgo" href="/shop/">Shop this look</a>
+        </div>
+      </div>
+      <div class="alllooks">
+        <a href="/shop/"><img src="/landing/img/look1.webp" alt="Kwa Mashu Nights look" loading="lazy"></a>
+        <a href="/shop/"><img src="/landing/img/look2.webp" alt="Weekend Hustle look" loading="lazy"></a>
+        <a href="/shop/"><img src="/landing/img/look3.webp" alt="Thrift Flex look" loading="lazy"></a>
+        <a href="/shop/"><img src="/landing/img/look4.webp" alt="Craziest On The Block look" loading="lazy"></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="rack" id="rack">
+    <div class="head">
+      <h2>The rack and the streets, 14 frames</h2>
+      <div class="slot" data-slot="7" aria-hidden="true"></div>
+    </div>
+    <div class="strip" tabindex="0" aria-label="Pieces and Durban streets, scroll sideways">
+      <a href="/shop/product/kwa-mashu-bomber"><img src="/landing/img/bomber.webp" alt="Kwa Mashu To The World bomber" loading="lazy"></a>
+      <a href="/shop/catalog"><img src="/landing/img/world/taxi-rank.webp" alt="A Durban taxi rank under its curved shelter" loading="lazy"></a>
+      <a href="/shop/product/mama-said-tee"><img src="/landing/img/mamasaid.webp" alt="Mama Said tee" loading="lazy"></a>
+      <a href="/shop/product/spaza-bucket"><img src="/landing/img/spaza.webp" alt="Spaza bucket hat" loading="lazy"></a>
+      <a href="/shop/catalog"><img src="/landing/img/world/warwick.webp" alt="A trader at Warwick Junction market, Durban" loading="lazy"></a>
+      <a href="/shop/product/yizwa-ke-manje-cardigan"><img src="/landing/img/cardigan.webp" alt="Yizwa Ke Manje cardigan" loading="lazy"></a>
+      <a href="/shop/product/umlazi-ailwo-knit"><img src="/landing/img/knit.webp" alt="Umlazi Ailwo! button knit" loading="lazy"></a>
+      <a href="/shop/catalog"><img src="/landing/img/world/durban-rising.webp" alt="Durban skyline at sunrise over the harbour" loading="lazy"></a>
+      <a href="/shop/product/braam-nights-track-pants"><img src="/landing/img/pants.webp" alt="Braam Nights wide-leg track pants" loading="lazy"></a>
+      <a href="/shop/product/craziest-threads-varsity"><img src="/landing/img/varsity.webp" alt="Craziest Threads varsity jacket" loading="lazy"></a>
+      <a href="/shop/"><img src="/landing/img/look1.webp" alt="Kwa Mashu Nights look" loading="lazy"></a>
+      <a href="/shop/"><img src="/landing/img/look2.webp" alt="Weekend Hustle look" loading="lazy"></a>
+      <a href="/shop/"><img src="/landing/img/look3.webp" alt="Thrift Flex look" loading="lazy"></a>
+      <a href="/shop/product/umlazi-unit-hoodie"><img src="/landing/img/hoodie.webp" alt="Umlazi Unit hoodie" loading="lazy"></a>
+    </div>
+  </section>
+
+  <section class="final ground" id="final" data-dark>
+    <div class="slot" data-slot="8" aria-hidden="true"></div>
+    <div class="copy">
+      <h2 class="rv">Cop it before<br>it’s gone</h2>
+      <p class="rv" style="--i:1">Six collections and twelve patches, Mzansi made and globally played. Order in the shop; we confirm on WhatsApp.</p>
+      <div class="fact rv" style="--i:2">33 pieces, from R349</div>
+      <a class="btn rv" style="--i:3" href="/shop/">Enter the shop</a>
     </div>
   </section>
 </main>
-<footer>
-  <span>© Crazy Button SA · Est. 2011</span>
-  <a href="https://www.instagram.com/crazybuttonsa/" rel="noopener">@crazybuttonsa</a>
-  <span>Kwa Mashu · Umlazi · Durban</span>
-  <a href="/landing/privacy.html">Privacy</a>
+
+<footer class="ground">
+  <div class="card">
+    <div class="msg">
+      <h2>Sharp sharp</h2>
+      <p>Thanks for riding Route One with us. A new drop lands every week and the good pieces go fast, so follow along and never miss one.</p>
+    </div>
+    <div class="addr">
+      <a href="https://www.instagram.com/crazybuttonsa/" rel="noopener">@crazybuttonsa on Instagram</a>
+      <a href="/shop/">Shop the drop</a>
+      <span>KwaMashu · Umlazi · Durban</span>
+      <a href="/landing/privacy.html">Privacy</a>
+    </div>
+    <div class="stamp"><img src="/landing/img/world/minibus.webp" alt="A minibus taxi in Durban" loading="lazy"></div>
+    <p class="imprint">© Crazy Button SA, est. 2011.<br>Durban photographs from Wikimedia Commons:
+      Umlazi by Yan-Di Chang (<a href="https://creativecommons.org/licenses/by/2.0" rel="noopener">CC BY 2.0</a>);
+      Durban beachfront at night by Marc Forrest (<a href="https://creativecommons.org/licenses/by/2.0" rel="noopener">CC BY 2.0</a>);
+      taxi rank and Durban sunrise by Chris Bloom (<a href="https://creativecommons.org/licenses/by-sa/2.0" rel="noopener">CC BY-SA 2.0</a>);
+      Warwick Junction trader by Alice Morrison and minibus taxi by Khethuthukuthula Mhlongo (<a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noopener">CC BY-SA 4.0</a>). Cropped and resized.</p>
+  </div>
 </footer>
 <script src="/landing/cb-analytics.js"></script>
 
