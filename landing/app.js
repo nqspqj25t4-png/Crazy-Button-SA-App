@@ -20,6 +20,41 @@ if (reduced || !('IntersectionObserver' in window)) {
 }
 
 
+
+/* ---------- the world: land on the painted street, explore it, step inside ---------- */
+const world = document.getElementById('world');
+if (world) {
+  const img = world.querySelector('.scene img');
+  const pct = document.getElementById('pct');
+  let shown = 0, target = 0, landed = false;
+  const tick = () => {
+    shown += (target - shown) * 0.12;
+    if (pct) pct.textContent = Math.min(100, Math.round(shown)) + '%';
+    if (!landed && shown > 99.4) land(); else if (!landed) requestAnimationFrame(tick);
+  };
+  function land() {
+    landed = true; if (pct) pct.textContent = '100%';
+    world.classList.add('landed');
+  }
+  if (reduced) { target = shown = 100; land(); }
+  else {
+    target = 35; requestAnimationFrame(tick);
+    const done = () => { target = 100; };
+    if (img.complete) setTimeout(done, 300); else { img.addEventListener('load', done); img.addEventListener('error', done); }
+    setTimeout(done, 4000);
+  }
+  // scrolling pushes the camera through the shop door, into the dark of the shop
+  const step = () => {
+    if (reduced) return;
+    const r = world.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight)));
+    world.style.setProperty('--zoom', (1 + Math.pow(p, 1.7) * 6).toFixed(3));
+    world.style.setProperty('--dusk', Math.min(1, Math.max(0, (p - 0.5) / 0.42)).toFixed(3));
+    world.style.setProperty('--ui', Math.max(0, 1 - p * 5).toFixed(3));
+  };
+  addEventListener('scroll', step, { passive: true }); addEventListener('resize', step); step();
+}
+
 /* ---------- showcase: one frame, three distances ---------- */
 const show = document.querySelector('.show');
 function showStage() {
