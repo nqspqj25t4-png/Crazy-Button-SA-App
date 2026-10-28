@@ -10,6 +10,7 @@ import { useBag } from '@/src/context/BagContext';
 import { Chip, Display, Eyebrow, ProductCard } from '@/src/components/ui';
 import { db } from '@/src/firebase';
 import { rememberRemote } from '@/src/lib/remoteProducts';
+import { track } from '@/src/lib/track';
 
 // Firestore product -> app product shape
 const fromFirestore = (d) => ({
@@ -50,6 +51,15 @@ export default function ShopScreen() {
   }, []);
 
   const all = useMemo(() => [...remote, ...CATALOG], [remote]);
+
+  // What people browse and search for
+  useEffect(() => { track('view_item_list', { item_list_name: cat }); }, [cat]);
+  useEffect(() => {
+    const term = search.trim();
+    if (term.length < 2) return undefined;
+    const t = setTimeout(() => track('search', { search_term: term.toLowerCase() }), 1200);
+    return () => clearTimeout(t);
+  }, [search]);
   const visible = useMemo(() => all.filter((p) => (cat === 'All' || p.category === cat) && p.title.toLowerCase().includes(search.trim().toLowerCase())), [all, cat, search]);
   const count = (c) => (c === 'All' ? all.length : all.filter((p) => p.category === c).length);
 

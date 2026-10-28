@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,6 +9,8 @@ import { findProduct, formatPrice } from '@/src/constants/catalog';
 import { useBag } from '@/src/context/BagContext';
 import { Button, Display, Eyebrow } from '@/src/components/ui';
 import { getRemote } from '@/src/lib/remoteProducts';
+import { track, trackItems } from '@/src/lib/track';
+import type { Product } from '@/src/constants/catalog';
 
 // Orders are taken over WhatsApp until online payments (e.g. PayFast / Stripe) are connected.
 const WHATSAPP = 'https://wa.me/41762523825';
@@ -16,7 +19,14 @@ export default function BagScreen() {
   const { lines, setQty, clear, currency, count } = useBag();
   const items = lines.map((l) => ({ ...l, p: findProduct(l.id) ?? getRemote(l.id) })).filter((x) => x.p);
 
+  const lines4track = items.map((x) => ({ p: x.p as Product, size: x.size, qty: x.qty }));
+  useFocusEffect(useCallback(() => {
+    if (lines4track.length) trackItems('view_cart', currency, lines4track);
+    else track('view_empty_bag');
+  }, [lines4track.length])); // eslint-disable-line react-hooks/exhaustive-deps
+
   const order = () => {
+    trackItems('begin_checkout', currency, lines4track, { checkout_method: 'whatsapp' });
     const text = ['Hi Crazy Button SA, I want to order:', ...items.map((x) => `• ${x.qty} × ${x.p!.title} (${x.size})`)].join('\n');
     Linking.openURL(`${WHATSAPP}?text=${encodeURIComponent(text)}`);
   };

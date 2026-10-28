@@ -2,7 +2,7 @@ import Feather from '@expo/vector-icons/Feather';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -11,6 +11,7 @@ import { CATALOG, findProduct, formatPrice, Product } from '@/src/constants/cata
 import { useBag } from '@/src/context/BagContext';
 import { Button, Display, Eyebrow, ProductCard } from '@/src/components/ui';
 import { getRemote } from '@/src/lib/remoteProducts';
+import { trackItems } from '@/src/lib/track';
 
 export default function ProductScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -21,6 +22,8 @@ export default function ProductScreen() {
   const [added, setAdded] = useState(false);
   const wide = width >= 900;
   const pad = wide ? 40 : 20;
+
+  useEffect(() => { if (p) trackItems('view_item', currency, [{ p }]); }, [p?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!p) {
     return (

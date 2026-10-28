@@ -7,6 +7,7 @@ import { Brand, Type } from '@/constants/theme';
 import { findProduct, formatPrice } from '@/src/constants/catalog';
 import { useBag } from '@/src/context/BagContext';
 import { Button, Display, Eyebrow } from '@/src/components/ui';
+import { track } from '@/src/lib/track';
 
 type Look = { no: string; name: string; collection: string; mood: string; image: number; items: string[] };
 
@@ -45,10 +46,11 @@ export function ShopTheLook({ wide, pad }: { wide: boolean; pad: number }) {
   const items = look.items.map((id) => findProduct(id)!).filter(Boolean);
 
   const addAll = () => {
-    items.forEach((p) => { const sz = p.sizes ?? ['One size']; add(p.id, sz.includes('M') ? 'M' : sz[0]); });
+    items.forEach((p) => { const sz = p.sizes ?? ['One size']; add(p.id, sz.includes('M') ? 'M' : sz[0], 1, `look_${look.no}`); });
+    track('add_full_look', { look_name: look.name, look_no: look.no, item_count: items.length });
     setAdded(`${items.length} pieces from ${look.name} are in your bag`);
   };
-  const pick = (n: number) => { setI(n); setAdded(null); };
+  const pick = (n: number) => { setI(n); setAdded(null); track('select_content', { content_type: 'look', item_id: LOOKS[n].name }); };
 
   return (
     <View style={{ backgroundColor: Brand.ink, paddingHorizontal: pad, paddingVertical: wide ? 64 : 40 }}>
