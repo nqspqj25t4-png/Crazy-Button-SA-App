@@ -218,8 +218,8 @@ section p{max-width:62ch}
 
 /* route one: the button rides down the schedule */
 .route{--g:var(--ink);color:var(--bone);margin-top:120px;padding:120px var(--m) 120px}
-.route .top{display:grid;grid-template-columns:1fr 22% 1fr;align-items:center;min-height:min(56vh,520px)}
-.route .top .slot{grid-column:2;grid-row:1;width:100%}
+.route .top{display:grid;grid-template-columns:1fr 30% 1fr;align-items:center;min-height:min(56vh,520px)}
+.route .top .slot{grid-column:2;grid-row:1;width:72%;justify-self:center;align-self:center}
 .route h2{display:contents}
 .route h2 span{font-size:var(--l)}
 .route h2 .w1{grid-column:1;text-align:right}
@@ -256,6 +256,8 @@ section p{max-width:62ch}
 .night h2{font-size:var(--l)}
 .night p{font-size:var(--small);max-width:30ch;text-align:right}
 .night img{object-position:50% 70%}
+.slot-night{position:absolute;right:var(--m);top:16%;width:min(24vw,340px);z-index:1}
+@media(max-width:760px){.slot-night{top:12%;width:44vw}}
 @media(max-width:760px){.night .z{flex-direction:column;align-items:flex-start}.night h2{font-size:13vw}.night p{text-align:left}}
 
 /* where you headed: the live thing */
@@ -467,7 +469,8 @@ footer{--g:var(--ink);padding:24px var(--m) 72px;color:var(--ink)}
     </div>
   </section>
 
-  <section class="night" id="durban">
+  <section class="night" id="durban" data-dark>
+    <div class="slot slot-night" data-slot="6" aria-hidden="true"></div>
     <img src="/landing/img/world/durban-night.webp" width="1920" height="1264" alt="Durban's beachfront skyline lit up at night across the water" loading="lazy">
     <div class="z">
       <h2 class="rv">Durban,<br>after dark</h2>
@@ -478,7 +481,7 @@ footer{--g:var(--ink);padding:24px var(--m) 72px;color:var(--ink)}
   <section class="headed" id="headed">
     <div class="grid">
       <h2 class="rv">Where you<br>headed?</h2>
-      <div class="slot" data-slot="6" aria-hidden="true"></div>
+      <div class="slot" data-slot="7" aria-hidden="true"></div>
       <p class="lead rv">Pick where you are going and we will dress you for it, head to toe.</p>
       <div class="boards rv" role="group" aria-label="Choose where you are headed">
         <button class="board" type="button" aria-pressed="true" data-look="0">KwaMashu after dark<small>Kwa Mashu Nights</small></button>
@@ -507,7 +510,7 @@ footer{--g:var(--ink);padding:24px var(--m) 72px;color:var(--ink)}
   <section class="rack" id="rack">
     <div class="head">
       <h2>The rack and the streets, 14 frames</h2>
-      <div class="slot" data-slot="7" aria-hidden="true"></div>
+      <div class="slot" data-slot="8" aria-hidden="true"></div>
     </div>
     <div class="strip" tabindex="0" aria-label="Pieces and Durban streets, scroll sideways">
       <a href="/shop/product/kwa-mashu-bomber"><img src="/landing/img/bomber.webp" alt="Kwa Mashu To The World bomber" loading="lazy"></a>
@@ -528,7 +531,7 @@ footer{--g:var(--ink);padding:24px var(--m) 72px;color:var(--ink)}
   </section>
 
   <section class="final ground" id="final" data-dark>
-    <div class="slot" data-slot="8" aria-hidden="true"></div>
+    <div class="slot" data-slot="9" aria-hidden="true"></div>
     <div class="copy">
       <h2 class="rv">Cop it before<br>it’s gone</h2>
       <p class="rv" style="--i:1">Six collections and twelve patches, Mzansi made and globally played. Order in the shop; we confirm on WhatsApp.</p>
