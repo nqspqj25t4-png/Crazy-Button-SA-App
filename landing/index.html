@@ -71,7 +71,7 @@ section p{max-width:62ch}
 .world .pin{position:sticky;top:0;height:100svh;overflow:hidden}
 .cam{position:absolute;inset:0;transform:scale(5);transform-origin:50% 0;transition:transform 2.6s cubic-bezier(.6,0,.15,1)}
 .landed .cam{transform:none}
-.scene{position:absolute;left:50%;top:50%;width:max(100vw,177.97svh);aspect-ratio:1600/899;transform:translate(-50%,-50%) scale(var(--zoom,1));transform-origin:50.3% 58%;will-change:transform;container-type:inline-size}
+.scene{position:absolute;left:50%;top:50%;width:max(100vw,177.97svh);aspect-ratio:1600/899;transform:translate(-50%,-50%) scale(var(--zoom,1));filter:blur(var(--sblur,0px));transform-origin:50.3% 58%;will-change:transform;container-type:inline-size}
 .scene>img{width:100%;height:100%;display:block}
 .scene.tall{display:none;width:max(100vw,56.19svh);aspect-ratio:899/1600;transform-origin:52.8% 61%}
 /* the shop's name, set crisp over the painted board */
@@ -94,7 +94,7 @@ section p{max-width:62ch}
 .caption p{font-size:var(--body);line-height:1.4}
 /* stepping inside: the shop's interior takes over, then the lights go down */
 .inside{position:absolute;inset:0;opacity:var(--inside,0);pointer-events:none;z-index:3;overflow:hidden}
-.inside img{width:100%;height:100%;object-fit:cover;object-position:40% 50%;transform:scale(var(--inzoom,1.15));transform-origin:50% 55%}
+.inside img{width:100%;height:100%;object-fit:cover;object-position:40% 50%;transform:translateX(var(--inx,0)) scale(var(--inzoom,1.15));transform-origin:50% 55%;will-change:transform}
 .dusk{position:absolute;inset:0;background:var(--ink);opacity:var(--dusk,0);pointer-events:none;z-index:4}
 .loader{position:absolute;top:84px;right:var(--m);z-index:5;pointer-events:none;transition:opacity .9s}
 .loader span{font:700 var(--mid)/1 var(--text);color:var(--ink)}
@@ -103,6 +103,7 @@ section p{max-width:62ch}
 @media (max-aspect-ratio:1/1){
   .scene.wide{display:none}
   .scene.tall{display:block}
+  .inside img{object-position:62% 50%}
 }
 @media(max-width:760px){
   .hs i{width:30px;height:30px}
@@ -256,8 +257,8 @@ section p{max-width:62ch}
 .night h2{font-size:var(--l)}
 .night p{font-size:var(--small);max-width:30ch;text-align:right}
 .night img{object-position:50% 70%}
-.slot-night{position:absolute;right:var(--m);top:16%;width:min(24vw,340px);z-index:1}
-@media(max-width:760px){.slot-night{top:12%;width:44vw}}
+.slot-night{position:absolute;right:max(var(--m),6vw);top:24%;width:min(20vw,300px);z-index:1}
+@media(max-width:760px){.slot-night{top:24%;width:44vw}}
 @media(max-width:760px){.night .z{flex-direction:column;align-items:flex-start}.night h2{font-size:13vw}.night p{text-align:left}}
 
 /* where you headed: the live thing */

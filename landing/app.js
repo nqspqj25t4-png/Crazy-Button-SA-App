@@ -43,21 +43,45 @@ if (world) {
     if (img.complete) setTimeout(done, 300); else { img.addEventListener('load', done); img.addEventListener('error', done); }
     setTimeout(done, 4000);
   }
-  // scrolling pushes the camera through the shop door, into the dark of the shop
-  const step = () => {
-    if (reduced) return;
+  // Scrolling walks the camera up to the shop door and through it. The camera eases after the
+  // scroll (so it glides instead of jumping), the street softens out of focus as you pass the door,
+  // and the painted interior comes towards you before the lights go down.
+  const c = (v) => Math.min(1, Math.max(0, v));
+  const ease = (t) => t * t * (3 - 2 * t);
+  let sp = 0, last = performance.now(), running = false;
+  const scrollP = () => {
     const r = world.getBoundingClientRect();
-    const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight)));
-    const c = (v) => Math.min(1, Math.max(0, v));
-    // 0-0.4 walk up to the door, 0.3-0.5 the interior fades in, 0.5-0.85 look around inside, 0.85-1 lights down
-    world.style.setProperty('--zoom', (1 + Math.pow(c(p / 0.5), 1.8) * 5).toFixed(3));
-    world.style.setProperty('--inside', c((p - 0.3) / 0.2).toFixed(3));
-    world.style.setProperty('--inzoom', (1.18 - c((p - 0.3) / 0.55) * 0.18).toFixed(3));
-    world.style.setProperty('--dusk', c((p - 0.85) / 0.15).toFixed(3));
+    return c(-r.top / Math.max(1, r.height - innerHeight));
+  };
+  const paint = (p) => {
+    const walk = ease(c(p / 0.44));
+    world.style.setProperty('--zoom', (1 + walk * 2.5).toFixed(4));
+    world.style.setProperty('--sblur', (c((p - 0.24) / 0.2) * 7).toFixed(2) + 'px');
+    const inn = c((p - 0.25) / 0.17);
+    world.style.setProperty('--inside', ease(inn).toFixed(4));
+    const through = ease(c((p - 0.25) / 0.27));                      // coming through the doorway
+    const look = c((p - 0.52) / 0.33);                                 // looking around inside
+    world.style.setProperty('--inzoom', (1.55 - through * 0.55 + look * 0.07).toFixed(4));
+    world.style.setProperty('--inx', (2.5 - look * 5).toFixed(2) + '%');
+    world.style.setProperty('--dusk', ease(c((p - 0.86) / 0.14)).toFixed(4));
     world.style.setProperty('--ui', c(1 - p * 6).toFixed(3));
   };
-  addEventListener('scroll', step, { passive: true }); addEventListener('resize', step); step();
+  const loop = (now) => {
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    const p = scrollP();
+    sp += (p - sp) * (1 - Math.exp(-dt * 7));
+    if (Math.abs(p - sp) < 0.0004) sp = p;
+    paint(sp);
+    if (sp !== p) requestAnimationFrame(loop); else running = false;
+  };
+  const kick = () => {
+    if (reduced) return;
+    if (!running) { running = true; last = performance.now(); requestAnimationFrame(loop); }
+  };
+  addEventListener('scroll', kick, { passive: true }); addEventListener('resize', kick);
+  sp = scrollP(); paint(sp);
 }
+
 
 
 /* ---------- hero: the logo pushes in between "Wear loud." and "Walk proud." ----------
@@ -326,8 +350,7 @@ function frame() {
   // face the camera squarely wherever the logo sits on screen (no perspective tilt),
   // then add the spin between sections and a gentle side-to-side sway
   const idle = reduced ? 0 : Math.sin(t * 0.6) * 0.07;   // even sway, centred on straight-ahead
-  button.rotation.set(0, 0, 0);
-  button.lookAt(camera.position);
+  button.rotation.set(0, 0, 0);   // parallel to the screen, so it is never skewed near the edges
   button.rotateY(cur.ry + idle);
   button.rotateX(cur.rx + 0.9 * (1 - hq) * (sq > 0 ? 1 : 0));   // tips forward as it pushes in
 
