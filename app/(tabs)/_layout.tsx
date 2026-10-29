@@ -16,7 +16,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: Brand.red,
         tabBarInactiveTintColor: Brand.smoke,
         tabBarStyle: { backgroundColor: Brand.bone, borderTopColor: Brand.ink, borderTopWidth: 1, height: 68, paddingTop: 6, paddingBottom: 10 },
-        tabBarLabelStyle: { fontFamily: Type.monoBold, fontSize: 10, lineHeight: 14, letterSpacing: 1, textTransform: 'uppercase' },
+        tabBarLabelStyle: { fontFamily: Type.bodyBold, fontSize: 13, lineHeight: 16 },
       }}>
       <Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: ({ color }) => <Feather name="home" size={22} color={color} /> }} />
       <Tabs.Screen name="catalog" options={{ title: 'Shop', tabBarIcon: ({ color }) => <Feather name="grid" size={22} color={color} /> }} />
@@ -29,7 +29,8 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Feather name="shopping-bag" size={22} color={color} />,
         }}
       />
-      <Tabs.Screen name="admin" options={{ title: 'Admin', tabBarIcon: ({ color }) => <Feather name="user" size={22} color={color} /> }} />
+      {/* the owner's admin page stays at /shop/admin but is not shown to customers */}
+      <Tabs.Screen name="admin" options={{ href: null, title: 'Admin' }} />
       <Tabs.Screen name="explore" options={{ href: null }} />
     </Tabs>
   );
