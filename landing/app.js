@@ -48,11 +48,56 @@ if (world) {
     if (reduced) return;
     const r = world.getBoundingClientRect();
     const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight)));
-    world.style.setProperty('--zoom', (1 + Math.pow(p, 1.7) * 6).toFixed(3));
-    world.style.setProperty('--dusk', Math.min(1, Math.max(0, (p - 0.5) / 0.42)).toFixed(3));
-    world.style.setProperty('--ui', Math.max(0, 1 - p * 5).toFixed(3));
+    const c = (v) => Math.min(1, Math.max(0, v));
+    // 0-0.4 walk up to the door, 0.3-0.5 the interior fades in, 0.5-0.85 look around inside, 0.85-1 lights down
+    world.style.setProperty('--zoom', (1 + Math.pow(c(p / 0.5), 1.8) * 5).toFixed(3));
+    world.style.setProperty('--inside', c((p - 0.3) / 0.2).toFixed(3));
+    world.style.setProperty('--inzoom', (1.18 - c((p - 0.3) / 0.55) * 0.18).toFixed(3));
+    world.style.setProperty('--dusk', c((p - 0.85) / 0.15).toFixed(3));
+    world.style.setProperty('--ui', c(1 - p * 6).toFixed(3));
   };
   addEventListener('scroll', step, { passive: true }); addEventListener('resize', step); step();
+}
+
+
+/* ---------- hero: the logo pushes in between "Wear loud." and "Walk proud." ----------
+   As the hero scrolls up, the two lines start pressed together in the middle, tipped back in 3D.
+   The logo arrives, squeezes itself in between them and shoves them apart: the top line tips up
+   and away, the bottom line tips down, the four words spread, and everything settles. */
+const hero = document.querySelector('.hero');
+window.__heroQ = 1;
+if (hero) {
+  const l1 = hero.querySelector('.l1'), l2 = hero.querySelector('.l2');
+  const words = [...hero.querySelectorAll('.big i')];
+  let c1 = 0, c2 = 0;
+  const measure = () => {
+    const mid = hero.clientHeight / 2;
+    c1 = mid - (l1.offsetTop + l1.offsetHeight) + 2;
+    c2 = mid - l2.offsetTop - 2;
+  };
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const step = () => {
+    let q = 1;
+    if (!reduced) {
+      const r = hero.getBoundingClientRect();
+      q = Math.min(1, Math.max(0, (innerHeight * 0.92 - r.top) / (innerHeight * 0.78)));
+    }
+    const e = ease(q), o = 1 - e;
+    const g = 0.18 + 0.82 * e;              // how big the logo is as it pushes in; the gap between the lines matches it
+    window.__heroQ = q; window.__heroG = g;
+    const gap = 1 - g;
+    l1.style.transform = `translateY(${(c1 * gap).toFixed(1)}px) rotateX(${(-55 * o).toFixed(1)}deg) scale(${(1 - 0.1 * o).toFixed(3)})`;
+    l2.style.transform = `translateY(${(c2 * gap).toFixed(1)}px) rotateX(${(55 * o).toFixed(1)}deg) scale(${(1 - 0.1 * o).toFixed(3)})`;
+    // the four words pressed tight, then pushed out to their places
+    words.forEach((w, i) => {
+      const dir = i % 2 === 0 ? 1 : -1;               // left words move in from the left, right words from the right
+      w.style.transform = `translateX(${(dir * 0.18 * o).toFixed(3)}em) rotateY(${(dir * 28 * o).toFixed(1)}deg)`;
+    });
+  };
+  measure(); step();
+  addEventListener('resize', () => { measure(); step(); });
+  addEventListener('scroll', step, { passive: true });
+  document.fonts && document.fonts.ready.then(() => { measure(); step(); });
 }
 
 /* ---------- showcase: one frame, three distances ---------- */
@@ -271,7 +316,11 @@ function frame() {
 
   // screen px -> world units (logo is 2 units wide at scale 1)
   const scale = (cur.w / W) * halfW;
-  button.scale.setScalar(scale);
+  // squeezing in between the hero lines: squashed tall-to-wide, then it springs back
+  const hq = window.__heroQ ?? 1;
+  const sq = hq > 0 && hq < 1 && slots[0] && cur.d > 0.5 ? Math.sin(Math.PI * hq) : 0;
+  const hg = hq < 1 ? (window.__heroG ?? 1) : 1;
+  button.scale.set(scale * hg * (1 + 0.16 * sq), scale * hg * (1 - 0.22 * sq), scale * hg);
   const bob = reduced ? 0 : Math.sin(t * 1.1) * 0.035 * scale;
   button.position.set((cur.cx / W - 0.5) * 2 * halfW, -(cur.cy / H - 0.5) * 2 * halfH + bob, 0);
   // face the camera squarely wherever the logo sits on screen (no perspective tilt),
@@ -280,7 +329,7 @@ function frame() {
   button.rotation.set(0, 0, 0);
   button.lookAt(camera.position);
   button.rotateY(cur.ry + idle);
-  button.rotateX(cur.rx);
+  button.rotateX(cur.rx + 0.9 * (1 - hq) * (sq > 0 ? 1 : 0));   // tips forward as it pushes in
 
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
