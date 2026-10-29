@@ -169,21 +169,21 @@ section p{max-width:62ch}
 
 /* showcase: one frame, three distances */
 .show{height:300vh;margin-top:var(--gap)}
-.show .stage{position:sticky;top:0;height:100svh;display:grid;grid-template-columns:1fr min(30vw,46svh) 1fr;grid-template-rows:1fr auto auto 1fr;column-gap:4vw;align-items:center;padding:72px var(--m) 24px;z-index:2}
+.show .stage{position:sticky;top:0;height:100svh;display:grid;grid-template-columns:1fr min(30vw,46svh) 1fr;grid-template-rows:minmax(0,1fr) auto auto auto minmax(0,1fr);column-gap:4vw;align-items:center;padding:72px var(--m) 24px;z-index:2}
 .show h2{display:contents}
 .show h2 span{grid-column:1/4;text-align:center;font-size:min(var(--l),11svh);position:relative;z-index:3}
-.show .h1{grid-row:1;align-self:end;margin-bottom:.12em}
-.show .h2{grid-row:3;align-self:start;margin-top:.12em;opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.show .h1{grid-row:2;align-self:end;margin-bottom:.12em}
+.show .h2{grid-row:4;align-self:start;margin-top:.12em;opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
 .show[data-s="2"] .h2,.show[data-s="3"] .h2{opacity:1;transform:none}
-.show .frame{grid-column:2;grid-row:2;aspect-ratio:4/5;overflow:hidden;background:var(--bone2)}
+.show .frame{grid-column:2;grid-row:3;aspect-ratio:4/5;overflow:hidden;background:var(--bone2)}
 .show .frame img{width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease);transform-origin:50% 40%}
 .show[data-s="2"] .frame img{transform:scale(1.8);transform-origin:42% 36%}
 .show[data-s="3"] .frame img{transform:scale(3.2);transform-origin:22% 52%}
-.show .cap{grid-column:3;grid-row:2;align-self:start;max-width:28ch;font-size:var(--body);opacity:0;transform:translateY(20px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.show .cap{grid-column:3;grid-row:3;align-self:start;max-width:28ch;font-size:var(--body);opacity:0;transform:translateY(20px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
 .show[data-s="3"] .cap{opacity:1;transform:none}
 .show .cap b{display:block;font:400 var(--mid)/1 var(--display);text-transform:uppercase;margin-bottom:10px}
 .show .cap .tlink{display:inline-block;margin-top:14px}
-.show .slot{grid-column:1;grid-row:2;width:min(16vw,230px);justify-self:end}
+.show .slot{grid-column:1;grid-row:3;width:min(16vw,230px);justify-self:end}
 @media(max-width:760px){
   .show .stage{grid-template-columns:1fr;grid-template-rows:auto auto auto auto;align-content:center;row-gap:8px}
   .show h2 span{grid-column:1;font-size:min(13vw,7svh)}
