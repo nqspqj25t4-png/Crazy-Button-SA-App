@@ -56,14 +56,15 @@ if (world) {
   const paint = (p) => {
     const walk = ease(c(p / 0.44));
     world.style.setProperty('--zoom', (1 + walk * 2.5).toFixed(4));
-    world.style.setProperty('--sblur', (c((p - 0.24) / 0.2) * 7).toFixed(2) + 'px');
-    const inn = c((p - 0.25) / 0.17);
+    world.style.setProperty('--sblur', (c((p - 0.22) / 0.16) * 4).toFixed(2) + 'px');
+    world.style.setProperty('--door', (Math.sin(Math.PI * c((p - 0.2) / 0.22)) * 0.92).toFixed(4));
+    const inn = c((p - 0.3) / 0.12);
     world.style.setProperty('--inside', ease(inn).toFixed(4));
     const through = ease(c((p - 0.25) / 0.27));                      // coming through the doorway
     const look = c((p - 0.52) / 0.33);                                 // looking around inside
     world.style.setProperty('--inzoom', (1.55 - through * 0.55 + look * 0.07).toFixed(4));
     world.style.setProperty('--inx', (2.5 - look * 5).toFixed(2) + '%');
-    world.style.setProperty('--dusk', ease(c((p - 0.86) / 0.14)).toFixed(4));
+    world.style.setProperty('--dusk', ease(c((p - 0.8) / 0.2)).toFixed(4));
     world.style.setProperty('--ui', c(1 - p * 6).toFixed(3));
   };
   const loop = (now) => {
@@ -95,7 +96,9 @@ if (hero) {
   const words = [...hero.querySelectorAll('.big i')];
   let c1 = 0, c2 = 0;
   const measure = () => {
-    const mid = hero.clientHeight / 2;
+    const r = hero.getBoundingClientRect();
+    const half = hero.clientHeight / 2;
+    const mid = Math.max(Math.min(half, (innerHeight - r.top) / 2), l1.offsetHeight + 8);   // centre of the visible part
     c1 = mid - (l1.offsetTop + l1.offsetHeight) + 2;
     c2 = mid - l2.offsetTop - 2;
   };
@@ -106,12 +109,13 @@ if (hero) {
       const r = hero.getBoundingClientRect();
       q = Math.min(1, Math.max(0, (innerHeight * 0.92 - r.top) / (innerHeight * 0.78)));
     }
+    measure();
     const e = ease(q), o = 1 - e;
     const g = 0.18 + 0.82 * e;              // how big the logo is as it pushes in; the gap between the lines matches it
     window.__heroQ = q; window.__heroG = g;
     const gap = 1 - g;
-    l1.style.transform = `translateY(${(c1 * gap).toFixed(1)}px) rotateX(${(-55 * o).toFixed(1)}deg) scale(${(1 - 0.1 * o).toFixed(3)})`;
-    l2.style.transform = `translateY(${(c2 * gap).toFixed(1)}px) rotateX(${(55 * o).toFixed(1)}deg) scale(${(1 - 0.1 * o).toFixed(3)})`;
+    l1.style.transform = `perspective(1100px) translateY(${(c1 * gap).toFixed(1)}px) rotateX(${(-55 * o).toFixed(1)}deg) scale(${(1 - 0.1 * o).toFixed(3)})`;
+    l2.style.transform = `perspective(1100px) translateY(${(c2 * gap).toFixed(1)}px) rotateX(${(55 * o).toFixed(1)}deg) scale(${(1 - 0.1 * o).toFixed(3)})`;
     // the four words pressed tight, then pushed out to their places
     words.forEach((w, i) => {
       const dir = i % 2 === 0 ? 1 : -1;               // left words move in from the left, right words from the right
@@ -273,7 +277,7 @@ window.__cbVariant = () => vi;
    next slot as you scroll, so it always sits in free space and never covers text.
    One full turn between slots, facing the viewer whenever it is parked. */
 const TAU = Math.PI * 2;
-const ROT = Array.from({ length: 12 }, (_, k) => ({ rx: 0, ry: k * TAU }));   // facing the viewer when parked; one full turn between sections
+const ROT = Array.from({ length: 12 }, (_, k) => ({ rx: 0, ry: 0, rz: k * TAU }));   // facing the viewer when parked; one full turn between sections
 const slots = [...document.querySelectorAll('.slot[data-slot]')].sort((a, b) => a.dataset.slot - b.dataset.slot);
 const LOGO_ASPECT = 1497 / 1401;   // logo width / height
 const smooth = (t) => t * t * (3 - 2 * t);
@@ -294,7 +298,7 @@ const DARK = slots.map((el) => (el.closest('[data-dark]') ? 1 : 0));
 function slotGoal(el, i) {
   const r = el.getBoundingClientRect();
   const w = Math.min(r.width, r.height * LOGO_ASPECT);
-  return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, w, d: DARK[i], rx: ROT[i].rx, ry: ROT[i].ry, on: r.width > 0 };
+  return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, w, d: DARK[i], rx: ROT[i].rx, ry: ROT[i].ry, rz: ROT[i].rz, f: 0, on: r.width > 0 };
 }
 function goalNow() {
   const g = slots.map(slotGoal).filter((x) => x.on);   // slots hidden on this screen size are skipped
@@ -302,8 +306,8 @@ function goalNow() {
   // last slot whose centre is at or above the middle of the screen
   let i = -1;
   for (let k = 0; k < g.length; k++) if (g[k].cy <= mid) i = k;
-  if (i < 0) return { cx: g[0].cx, cy: g[0].cy, w: g[0].w, d: g[0].d, rx: g[0].rx, ry: g[0].ry };
-  if (i >= g.length - 1) { const z = g[g.length - 1]; return { cx: z.cx, cy: z.cy, w: z.w, d: z.d, rx: z.rx, ry: z.ry }; }
+  if (i < 0) { const z = g[0]; return { cx: z.cx, cy: z.cy, w: z.w, d: z.d, rx: z.rx, ry: z.ry, rz: z.rz, f: 0 }; }
+  if (i >= g.length - 1) { const z = g[g.length - 1]; return { cx: z.cx, cy: z.cy, w: z.w, d: z.d, rx: z.rx, ry: z.ry, rz: z.rz, f: 0 }; }
   const a = g[i], b = g[i + 1];
   // Ride along with slot i, then sweep into slot i+1 over a short scroll distance just
   // before it reaches the middle of the screen; long gaps never mean a long crossing.
@@ -312,14 +316,16 @@ function goalNow() {
   const flyLen = Math.min(0.6 * dist, 0.55 * H);
   const endAt = Math.min(0.12 * dist, 0.1 * H);
   const t = smooth(Math.min(1, Math.max(0, (flyLen - r) / Math.max(1, flyLen - endAt))));
-  const lift = Math.sin(t * Math.PI) * 0.18;                      // gentle arc while flying
+  const f = Math.sin(t * Math.PI);                                   // 0 parked, 1 mid-flight
   return {
     cx: a.cx + (b.cx - a.cx) * t,
     cy: a.cy + (b.cy - a.cy) * t,
-    w: (a.w + (b.w - a.w) * t) * (1 - lift * 0.4),
+    w: (a.w + (b.w - a.w) * t) * (1 - 0.55 * f),                     // tucks small while it travels over content
     rx: a.rx + (b.rx - a.rx) * t,
     ry: a.ry + (b.ry - a.ry) * t,
+    rz: a.rz + (b.rz - a.rz) * t,                                    // rolls one full turn, like a button
     d: a.d + (b.d - a.d) * t,
+    f,
   };
 }
 
@@ -351,8 +357,9 @@ function frame() {
   // then add the spin between sections and a gentle side-to-side sway
   const idle = reduced ? 0 : Math.sin(t * 0.6) * 0.07;   // even sway, centred on straight-ahead
   button.rotation.set(0, 0, 0);   // parallel to the screen, so it is never skewed near the edges
-  button.rotateY(cur.ry + idle);
+  button.rotateY(cur.ry + idle + 0.45 * cur.f);                 // leans a little into the turn
   button.rotateX(cur.rx + 0.9 * (1 - hq) * (sq > 0 ? 1 : 0));   // tips forward as it pushes in
+  button.rotateZ(-cur.rz);
 
   renderer.render(scene, camera);
   requestAnimationFrame(frame);

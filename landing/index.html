@@ -86,6 +86,7 @@ section p{max-width:62ch}
 .hs i svg{position:relative;width:100%;height:100%;display:block}
 .hs span{font:700 var(--small)/1.2 var(--text);background:var(--ink);color:var(--bone);padding:8px 11px;white-space:nowrap;transition:background .2s,color .2s,opacity .25s}
 @media (hover:hover){.hs span{opacity:0}.hs:hover span,.hs:focus-visible span{opacity:1}}
+@media (hover:none){.hs:not(.main) span{display:none}}
 .hs:hover i,.hs:focus-visible i{transform:scale(1.15)}
 .hs:hover span,.hs:focus-visible span{background:var(--gold);color:var(--ink)}
 .hs.left{flex-direction:row-reverse;transform:translate(calc(-100% + 17px),-50%)}
@@ -96,6 +97,7 @@ section p{max-width:62ch}
 /* stepping inside: the shop's interior takes over, then the lights go down */
 .inside{position:absolute;inset:0;opacity:var(--inside,0);pointer-events:none;z-index:3;overflow:hidden}
 .inside img{width:100%;height:100%;object-fit:cover;object-position:40% 50%;transform:translateX(var(--inx,0)) scale(var(--inzoom,1.15));transform-origin:50% 55%;will-change:transform}
+.door{position:absolute;inset:0;background:radial-gradient(ellipse 60% 55% at 50% 56%,rgba(18,18,18,.6),rgba(18,18,18,.96));opacity:var(--door,0);pointer-events:none;z-index:2}
 .dusk{position:absolute;inset:0;background:var(--ink);opacity:var(--dusk,0);pointer-events:none;z-index:4}
 .loader{position:absolute;top:84px;right:var(--m);z-index:5;pointer-events:none;transition:opacity .9s}
 .loader span{font:700 var(--mid)/1 var(--text);color:var(--ink)}
@@ -121,7 +123,6 @@ section p{max-width:62ch}
 .hero .big .l1{grid-row:1}
 .hero .big .l2{grid-row:3}
 /* the two lines start together in the middle and part to let the logo in */
-.hero{perspective:1100px}
 .hero .big span{position:relative;z-index:3;transform-style:preserve-3d;will-change:transform}
 .hero .big i{font-style:normal;display:inline-block;will-change:transform}
 .hero .big .l1{transform-origin:50% 100%}
@@ -170,7 +171,7 @@ section p{max-width:62ch}
 }
 
 /* showcase: one frame, three distances */
-.show{height:300vh;margin-top:var(--gap)}
+.show{height:300vh}
 .show .stage{position:sticky;top:0;height:100svh;display:grid;grid-template-columns:1fr min(30vw,46svh) 1fr;grid-template-rows:minmax(0,1fr) auto auto auto minmax(0,1fr);column-gap:4vw;align-items:center;padding:72px var(--m) 24px;z-index:2}
 .show h2{display:contents}
 .show h2 span{grid-column:1/4;text-align:center;font-size:min(var(--l),11svh);position:relative;z-index:3}
@@ -196,7 +197,7 @@ section p{max-width:62ch}
 }
 
 /* how it becomes drip: tiles that grow */
-.grow{padding:var(--gap) var(--m) 0}
+.grow{padding:calc(var(--gap) * .55) var(--m) 0}
 .grow .grid{display:grid;grid-template-columns:repeat(12,1fr);column-gap:10px;align-items:end}
 .grow h2{grid-column:1/8;grid-row:1;align-self:start;font-size:var(--l)}
 .grow .slot{grid-column:5/8;grid-row:1;align-self:start;justify-self:center;width:min(14vw,200px);margin-top:4px}
@@ -247,6 +248,7 @@ section p{max-width:62ch}
   .route .rail,.route .top .slot{display:none}
   .rows li{grid-template-columns:1fr;padding:18px 16px}
   .rows .when{grid-column:1;text-align:left;margin-top:8px}
+  .route{margin-top:72px;padding:64px var(--m) 72px}
 }
 
 /* the one deliberate rest: Durban at night */
@@ -254,7 +256,7 @@ section p{max-width:62ch}
 .night img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;transform:scale(1.15);transition:transform 6s linear}
 .night.in img{transform:scale(1)}
 .night::after{content:'';position:absolute;left:0;right:0;bottom:0;height:55%;z-index:1;pointer-events:none;background:linear-gradient(transparent,rgba(10,10,10,.72))} /* taste-skill-ignore: neutral scrim under text on a photo */
-.night .z{position:absolute;left:var(--m);bottom:40px;right:var(--m);display:flex;justify-content:space-between;align-items:end;gap:20px}
+.night .z{position:absolute;left:var(--m);bottom:84px;right:var(--m);display:flex;justify-content:space-between;align-items:end;gap:20px}
 .night h2{font-size:var(--l)}
 .night p{font-size:var(--small);max-width:30ch;text-align:right}
 .night img{object-position:50% 70%}
@@ -307,7 +309,7 @@ section p{max-width:62ch}
 @media(max-width:760px){.rack .slot{display:none}.strip a{width:34vw;min-width:0;height:51vw}.rack h2{margin-bottom:20px}}
 
 /* the object returns */
-.final{--g:var(--ink);color:var(--bone);min-height:90svh;margin-top:var(--gap);overflow:hidden;display:grid;grid-template-columns:repeat(12,1fr);column-gap:24px;align-items:center;padding:80px var(--m)}
+.final{--g:var(--ink);color:var(--bone);min-height:90svh;margin-top:var(--gap);clip-path:inset(-60px 0 0 0);display:grid;grid-template-columns:repeat(12,1fr);column-gap:24px;align-items:center;padding:80px var(--m)}
 .final .slot{grid-column:1/8;grid-row:1;justify-self:center;align-self:center;height:min(64svh,38vw);width:auto}
 .final .copy{grid-column:8/13;grid-row:1;display:flex;flex-direction:column;gap:18px}
 .final h2{font-size:var(--mid);line-height:1}
@@ -319,6 +321,12 @@ section p{max-width:62ch}
   .final .copy{order:1}.final .btn{align-self:stretch}
   .final .slot{position:relative;left:auto;top:auto;bottom:auto;transform:none;height:auto;width:min(86vw,58svh);margin:28px auto 36px;order:2}
 }
+
+
+/* seams: a row of half-buttons where a dark section meets a light one */
+.route::before,.final::before{content:'';position:absolute;left:0;right:0;top:-49px;height:50px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23121212'/%3E%3C/svg%3E") 0 0/100px 50px repeat-x}
+.night::before{content:'';position:absolute;left:0;right:0;bottom:-1px;height:50px;z-index:2;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23EDE8DF'/%3E%3C/svg%3E") 0 0/100px 50px repeat-x}
+@media(max-width:760px){.route::before,.final::before,.night::before{height:26px;background-size:52px 26px}.route::before,.final::before{top:-25px}}
 
 /* footer: the back of the postcard */
 footer{--g:var(--ink);padding:24px var(--m) 72px;color:var(--ink)}
@@ -374,7 +382,7 @@ footer{--g:var(--ink);padding:24px var(--m) 72px;color:var(--ink)}
       <div class="cam">
         <div class="scene wide">
           <img src="/landing/img/world/kwamashu-street-v3.webp" width="3200" height="1798" alt="A painted KwaMashu street corner: the Crazy Button SA spaza shop in flag colours, a minibus taxi to Durban, a gogo in Crazy Button gear walking past and two friends in Crazy Button gear leaning on the wall">
-          <a class="hs " href="/shop/" style="left:50.3%;top:52%"><i><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#EDE8DF"/><circle cx="20" cy="20" r="14" fill="#1B2D7A"/><circle cx="16" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="16" cy="24" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="24" r="2.6" fill="#EDE8DF"/></svg></i><span>Step inside the shop</span></a>
+          <a class="hs main" href="/shop/" style="left:50.3%;top:52%"><i><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#EDE8DF"/><circle cx="20" cy="20" r="14" fill="#1B2D7A"/><circle cx="16" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="16" cy="24" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="24" r="2.6" fill="#EDE8DF"/></svg></i><span>Step inside the shop</span></a>
           <a class="hs " href="#route" style="left:14%;top:56%"><i><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#EDE8DF"/><circle cx="20" cy="20" r="14" fill="#1B2D7A"/><circle cx="16" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="16" cy="24" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="24" r="2.6" fill="#EDE8DF"/></svg></i><span>Route One: six drops</span></a>
           <a class="hs " href="#headed" style="left:32%;top:64%"><i><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#EDE8DF"/><circle cx="20" cy="20" r="14" fill="#1B2D7A"/><circle cx="16" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="16" cy="24" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="24" r="2.6" fill="#EDE8DF"/></svg></i><span>Dress like gogo’s day out</span></a>
           <a class="hs left" href="#fresh" style="left:68%;top:61%"><i><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#EDE8DF"/><circle cx="20" cy="20" r="14" fill="#1B2D7A"/><circle cx="16" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="16" cy="24" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="24" r="2.6" fill="#EDE8DF"/></svg></i><span>Fresh off the needle</span></a>
@@ -383,7 +391,7 @@ footer{--g:var(--ink);padding:24px var(--m) 72px;color:var(--ink)}
         </div>
         <div class="scene tall">
           <img src="/landing/img/world/kwamashu-street-v3-tall.webp" width="1798" height="3200" alt="A painted KwaMashu street corner: the Crazy Button SA spaza shop in flag colours, a minibus taxi to Durban, a gogo in Crazy Button gear walking past and two friends in Crazy Button gear leaning on the wall">
-          <a class="hs " href="/shop/" style="left:52.8%;top:58%"><i><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#EDE8DF"/><circle cx="20" cy="20" r="14" fill="#1B2D7A"/><circle cx="16" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="16" cy="24" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="24" r="2.6" fill="#EDE8DF"/></svg></i><span>Step inside</span></a>
+          <a class="hs main" href="/shop/" style="left:52.8%;top:58%"><i><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#EDE8DF"/><circle cx="20" cy="20" r="14" fill="#1B2D7A"/><circle cx="16" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="16" cy="24" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="24" r="2.6" fill="#EDE8DF"/></svg></i><span>Step inside</span></a>
           <a class="hs " href="#route" style="left:13%;top:64%"><i><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#EDE8DF"/><circle cx="20" cy="20" r="14" fill="#1B2D7A"/><circle cx="16" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="16" cy="24" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="24" r="2.6" fill="#EDE8DF"/></svg></i><span>Route One</span></a>
           <a class="hs " href="#headed" style="left:30%;top:70%"><i><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#EDE8DF"/><circle cx="20" cy="20" r="14" fill="#1B2D7A"/><circle cx="16" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="16" cy="24" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="24" r="2.6" fill="#EDE8DF"/></svg></i><span>Get the look</span></a>
           <a class="hs left" href="#fresh" style="left:74%;top:66%"><i><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#EDE8DF"/><circle cx="20" cy="20" r="14" fill="#1B2D7A"/><circle cx="16" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="16" cy="24" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="24" r="2.6" fill="#EDE8DF"/></svg></i><span>New in</span></a>
@@ -391,6 +399,7 @@ footer{--g:var(--ink);padding:24px var(--m) 72px;color:var(--ink)}
           <a class="hs left" href="#rack" style="left:91%;top:50%"><i><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#EDE8DF"/><circle cx="20" cy="20" r="14" fill="#1B2D7A"/><circle cx="16" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="16" r="2.6" fill="#EDE8DF"/><circle cx="16" cy="24" r="2.6" fill="#EDE8DF"/><circle cx="24" cy="24" r="2.6" fill="#EDE8DF"/></svg></i><span>The rack</span></a>
         </div>
       </div>
+      <div class="door"></div>
       <div class="inside" aria-hidden="true"><img src="/landing/img/world/spaza-inside-v4.webp" width="3200" height="1798" alt="" loading="lazy"></div>
       <div class="caption z"><h1>Crazy Button SA</h1><p>Streetwear from KwaMashu, Umlazi and Durban, est. 2011. Tap around the street, or scroll to step inside.</p></div>
       <div class="dusk"></div>
