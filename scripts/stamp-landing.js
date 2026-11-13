@@ -13,4 +13,12 @@ edit('dist/index.html', (h) => h.replace('/landing/app.js"', `/landing/app.js?v=
 edit('dist/landing/app.js', (js) => js.replace("'/landing/img/logo-shapes.json'", `'/landing/img/logo-shapes.json?v=${v}'`));
 edit('dist/landing/privacy.html', (h) => h.replace('/landing/cb-analytics.js"', `${tag}"`));
 edit('dist/shop/index.html', (h) => (h.includes('cb-analytics.js') ? h : h.replace('</body>', `<script src="${tag}"></script></body>`)));
+// Expo's web template has no description or share tags, and writes the React-style `httpEquiv`.
+const shopMeta = '<meta name="description" content="Shop Crazy Button SA: hoodies, jackets, knits, tees, hats and patches from KwaMashu, Umlazi and Durban.">'
+  + '<meta property="og:title" content="Crazy Button SA Shop — Wear loud. Walk proud.">'
+  + '<meta property="og:description" content="Mzansi\'s loudest streetwear, straight from KwaMashu, Umlazi and Durban.">'
+  + '<meta property="og:image" content="https://crazybuttonsa.web.app/landing/img/look4.webp">'
+  + '<meta property="og:url" content="https://crazybuttonsa.web.app/shop/">'
+  + '<meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image">';
+edit('dist/shop/index.html', (h) => h.replace('httpEquiv=', 'http-equiv=').replace('</title>', h.includes('og:title') ? '</title>' : `</title>${shopMeta}`));
 console.log('landing stamped', v, 'analytics', a);

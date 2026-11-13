@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /shop/admin
+
+Sitemap: https://crazybuttonsa.web.app/sitemap.xml

@@ -14,10 +14,6 @@
       {
         "source": "/shop/**",
         "destination": "/shop/index.html"
-      },
-      {
-        "source": "**",
-        "destination": "/index.html"
       }
     ],
     "headers": [
