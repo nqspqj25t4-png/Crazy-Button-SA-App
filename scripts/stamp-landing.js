@@ -21,4 +21,8 @@ const shopMeta = '<meta name="description" content="Shop Crazy Button SA: hoodie
   + '<meta property="og:url" content="https://crazybuttonsa.web.app/shop/">'
   + '<meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image">';
 edit('dist/shop/index.html', (h) => h.replace('httpEquiv=', 'http-equiv=').replace('</title>', h.includes('og:title') ? '</title>' : `</title>${shopMeta}`));
-console.log('landing stamped', v, 'analytics', a);
+// Older versions of the paintings stay in the repo but are not uploaded.
+const used = ['dist/index.html', 'dist/landing/app.js'].map((f) => fs.readFileSync(f, 'utf8')).join('\n');
+const pruned = fs.readdirSync('dist/landing/img/world').filter((f) => !used.includes(`/landing/img/world/${f}`));
+pruned.forEach((f) => fs.unlinkSync(`dist/landing/img/world/${f}`));
+console.log('landing stamped', v, 'analytics', a, '| unused paintings skipped:', pruned.length);

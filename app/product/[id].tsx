@@ -2,6 +2,7 @@ import Feather from '@expo/vector-icons/Feather';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
+import Head from 'expo-router/head';
 import { useEffect, useState } from 'react';
 import { Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,6 +29,7 @@ export default function ProductScreen() {
   if (!p) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: Brand.bone, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+        <Head><title>Product not found — Crazy Button SA</title></Head>
         <Display size={32}>Product not found</Display>
         <Button label="Back to shop" onPress={() => router.replace('/catalog')} />
       </SafeAreaView>
@@ -48,6 +50,10 @@ export default function ProductScreen() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Brand.bone }}>
+      <Head>
+        <title>{`${p.title} — Crazy Button SA`}</title>
+        <meta name="description" content={p.description} />
+      </Head>
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
         <View style={{ flexDirection: wide ? 'row' : 'column', maxWidth: 1360, width: '100%', alignSelf: 'center' }}>
           <View style={{ flex: 1, aspectRatio: 4 / 5, backgroundColor: Brand.studio }}>
