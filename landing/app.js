@@ -62,10 +62,12 @@ if (world) {
     world.style.setProperty('--inside', ease(inn).toFixed(4));
     const through = ease(c((p - 0.25) / 0.27));                      // coming through the doorway
     const look = c((p - 0.52) / 0.33);                                 // looking around inside
-    world.style.setProperty('--inzoom', (1.55 - through * 0.55 + look * 0.07).toFixed(4));
+    world.style.setProperty('--inzoom', (1.3 - through * 0.3 + look * 0.04).toFixed(4));
     world.style.setProperty('--inx', (2.5 - look * 5).toFixed(2) + '%');
+    world.style.setProperty('--inpos', (30 + ease(c((p - 0.4) / 0.45)) * 68).toFixed(1) + '%');   // phones: walk the eye from the door, past the jackets, to the counter prices
     world.style.setProperty('--dusk', ease(c((p - 0.8) / 0.2)).toFixed(4));
     world.style.setProperty('--ui', c(1 - p * 6).toFixed(3));
+    world.style.setProperty('--capvis', p > 0.17 ? 'hidden' : 'visible');
   };
   const loop = (now) => {
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
