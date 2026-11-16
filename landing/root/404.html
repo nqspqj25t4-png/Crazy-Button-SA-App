@@ -16,7 +16,12 @@ body{background:var(--bone);color:var(--ink);font:17px/1.6 'Source Sans 3',syste
 .wrap{max-width:720px;margin:0 auto;padding:40px 16px 80px}
 a{color:inherit;text-underline-offset:3px}
 a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
-.top{font:700 12px 'Space Mono',monospace;letter-spacing:.16em;text-transform:uppercase}
+.top{font-weight:700}
+.empty{position:relative;width:min(360px,80vw);height:150px;margin:28px 0 0}
+.empty::before{content:"";position:absolute;left:0;right:0;top:20px;height:14px;border-radius:7px;background:linear-gradient(#F6E3B4,#E9C98A 22%,#B98A3E 60%,#7E5A22);box-shadow:0 5px 6px -2px rgba(18,18,18,.22)}
+.empty svg{position:absolute;left:50%;top:6px;width:150px;margin-left:-75px;overflow:visible;transform-origin:50% 8px;animation:sway 3.4s ease-in-out infinite alternate}
+@keyframes sway{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+@media(prefers-reduced-motion:reduce){.empty svg{animation:none}}
 h1{font:400 clamp(48px,9vw,88px)/.92 Anton,Impact,sans-serif;text-transform:uppercase;margin:36px 0 18px}
 p{max-width:52ch;margin-bottom:28px}
 .r{display:flex;gap:10px;flex-wrap:wrap}
@@ -27,8 +32,9 @@ p{max-width:52ch;margin-bottom:28px}
 <body>
 <div class="wrap">
   <a class="top" href="/">← Crazy Button SA</a>
+  <div class="empty" aria-hidden="true"><svg viewBox="0 0 150 130"><path d="M75 120 V20 C75 9 86 9 86 15" fill="none" stroke="#2F2C2A" stroke-width="3.4"/><path d="M14 118 Q45 96 75 82 Q105 96 136 118" fill="none" stroke="#6E4F28" stroke-width="9" stroke-linecap="round"/><path d="M14 118 H136" stroke="#6E4F28" stroke-width="5" stroke-linecap="round"/></svg></div>
   <h1>Eish!<br>Wrong turn.</h1>
-  <p>This page took a taxi and never came back. The drop is still live though.</p>
+  <p>This hanger's empty. The page took a taxi and never came back, but the drop is still live.</p>
   <div class="r"><a class="btn" href="/shop/">Shop the drop</a><a class="btn dark" href="/">Back home</a></div>
 </div>
 </body>

@@ -77,7 +77,8 @@ export const COLLECTIONS = [
 export const formatPrice = (p: Product, currency: 'ZAR' | 'EUR') => {
   const v = currency === 'ZAR' ? p.priceZAR : p.priceEUR;
   if (v == null) return currency === 'ZAR' ? 'R —' : '€ —';
-  return currency === 'ZAR' ? `R${v.toLocaleString('en-ZA')}` : `€${v}`;
+  // same style as the landing page: R2,449
+  return currency === 'ZAR' ? `R${v.toLocaleString('en-ZA').replace(/\s/g, ',')}` : `€${v}`;
 };
 
 export const findProduct = (id: string) => CATALOG.find((p) => p.id === id);

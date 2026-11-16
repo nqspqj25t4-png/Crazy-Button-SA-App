@@ -64,8 +64,8 @@
   }
 
   // ---------- branded consent banner ----------
-  var css = '#cb-consent{position:fixed;left:16px;bottom:16px;z-index:9999;max-width:400px;background:#121212;color:#EDE8DF;padding:20px;font-family:"Source Sans 3",SourceSans3_400Regular,system-ui,sans-serif;font-size:16px;line-height:1.45;box-shadow:0 18px 50px rgba(0,0,0,.35);/* taste-skill-ignore: a real floating dialog */transform:translateY(12px);opacity:0;transition:transform .35s ease,opacity .35s ease}'
-    + '#cb-consent.in{transform:none;opacity:1}'
+  var css = '#cb-consent{position:fixed;left:16px;bottom:16px;z-index:9999;max-width:400px;background:#121212;color:#EDE8DF;padding:20px;font-family:"Source Sans 3",SourceSans3_400Regular,system-ui,sans-serif;font-size:16px;line-height:1.45;box-shadow:0 18px 50px rgba(0,0,0,.35);/* taste-skill-ignore: a real floating dialog */transform:translateY(calc(100% + 40px)) scale(.94) rotate(-2deg);opacity:0;visibility:hidden;transition:transform .42s cubic-bezier(.55,0,.75,.2),opacity .3s ease .1s,visibility 0s .45s}'
+    + '#cb-consent.in{transform:none;opacity:1;visibility:visible;transition:transform .7s cubic-bezier(.3,1.6,.5,1),opacity .25s ease,visibility 0s}'
     + '#cb-consent .e{font-family:Anton,Anton_400Regular,Impact,sans-serif;font-size:clamp(24px,2.2vw,32px);line-height:1;text-transform:uppercase;color:#F2B33D;margin:0 0 8px}'
     + '#cb-consent p{margin:0 0 14px}#cb-consent a{color:#EDE8DF;text-decoration:underline;text-underline-offset:3px}'
     + '#cb-consent .r{display:flex;gap:10px;flex-wrap:wrap}'
@@ -74,7 +74,7 @@
     + '#cb-consent button.g{background:#2E2C2A;color:#EDE8DF}#cb-consent button.g:hover{background:#3A3835}'
     + '#cb-consent button:focus-visible{outline:3px solid #F2B33D;outline-offset:3px}'
     + '@media (max-width:520px){#cb-consent{left:12px;right:12px;bottom:12px;max-width:none}}'
-    + '@media (prefers-reduced-motion:reduce){#cb-consent{transition:none}}';
+    + '@media (prefers-reduced-motion:reduce){#cb-consent,#cb-consent.in{transition:none}}';
 
   function banner() {
     if (d.getElementById('cb-consent')) return;
@@ -85,7 +85,21 @@
       + '<p>We count visits and clicks to make every drop hit harder. No ads, nothing sold. <a href="/landing/privacy.html">Privacy</a></p>'
       + '<div class="r"><button type="button" data-v="granted">Accept</button><button type="button" class="g" data-v="denied">Decline</button></div>';
     d.body.appendChild(el);
-    requestAnimationFrame(function () { el.classList.add('in'); });
+    // pops up when you land at the top, gets out of the way while you scroll, and pops up once more at the bottom
+    var bottomDone = false, ticking = false, atBottom = false, foot = d.querySelector('footer');
+    function show(on) { if (el.classList.contains('in') === on) return; el.classList.toggle('in', on); el.inert = !on; if (on) el.removeAttribute('aria-hidden'); else el.setAttribute('aria-hidden', 'true'); }
+    function check() {
+      ticking = false;
+      if (!el.isConnected) return;
+      var y = w.scrollY || d.documentElement.scrollTop || 0, end = d.documentElement.scrollHeight - w.innerHeight;
+      if (end <= 200 || y < 140) return show(true);
+      if (atBottom || y >= end - 180) { if (!bottomDone) { bottomDone = true; show(true); } return; }
+      show(false);
+    }
+    el.inert = true; el.setAttribute('aria-hidden', 'true');
+    if (foot && w.IntersectionObserver) new IntersectionObserver(function (es) { atBottom = es[0].isIntersecting; check(); }, { threshold: 0.25 }).observe(foot);
+    setTimeout(check, 700);
+    w.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(check); } }, { passive: true });
     el.addEventListener('click', function (e) {
       var v = e.target.getAttribute && e.target.getAttribute('data-v');
       if (!v) return;
@@ -98,6 +112,18 @@
   // Lets the privacy page reopen the choice.
   w.cbConsent = { open: function () { store(KEY, ''); banner(); }, state: function () { return store(KEY); } };
 
-  function init() { if (store(KEY) === 'granted') start(); else if (store(KEY) !== 'denied') banner(); }
+  // arriving from the home page's gold wipe: the shop lifts it away
+  function wipeOut() {
+    var flag = null; try { flag = sessionStorage.getItem('cb-wipe'); sessionStorage.removeItem('cb-wipe'); } catch (e) {}
+    if (flag !== '1' || !/^\/shop/.test(location.pathname)) return;
+    var el = d.createElement('div');
+    el.setAttribute('aria-hidden', 'true');
+    el.style.cssText = 'position:fixed;inset:0;z-index:100000;background:#F2B33D;transition:transform .6s cubic-bezier(.7,0,.3,1);pointer-events:none';
+    d.body.appendChild(el);
+    setTimeout(function () { el.style.transform = 'translateY(-101%)'; }, 250);
+    setTimeout(function () { el.remove(); }, 1000);
+  }
+  function init() {
+    wipeOut(); if (store(KEY) === 'granted') start(); else if (store(KEY) !== 'denied') banner(); }
   if (d.body) init(); else d.addEventListener('DOMContentLoaded', init);
 })();

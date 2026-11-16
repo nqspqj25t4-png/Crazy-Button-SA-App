@@ -47,7 +47,7 @@ export default function HomeScreen() {
             <Image source={LOGO} style={{ width: 40, height: 38 }} contentFit="contain" />
             <Text style={styles.wordmark}>Crazy Button <Text style={{ color: Brand.red }}>SA</Text></Text>
           </View>
-          <Text style={styles.drop}>NO RE-UP · DROP LIVE</Text>
+          <Text style={styles.drop} onPress={() => Linking.openURL('/')} accessibilityRole="link">Back to the street</Text>
         </View>
 
         {/* Hero */}
@@ -144,7 +144,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   topbar: { backgroundColor: Brand.bone, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderColor: Brand.ink },
   wordmark: { fontFamily: Type.display, fontSize: 22, textTransform: 'uppercase', color: Brand.ink },
-  drop: { fontFamily: Type.monoBold, fontSize: 10, letterSpacing: 1.2, color: Brand.red },
+  drop: { fontFamily: Type.body, fontWeight: '700', fontSize: 15, color: Brand.ink, textDecorationLine: 'underline' },
   hero: { backgroundColor: Brand.ink },
   heroBody: { fontFamily: Type.body, fontSize: 17, lineHeight: 26, color: Brand.concrete, maxWidth: 460 },
   heroTag: { position: 'absolute', left: 16, bottom: 16, backgroundColor: Brand.bone, paddingHorizontal: 14, paddingVertical: 10 },

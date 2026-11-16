@@ -57,7 +57,7 @@ export const ProductCard = ({ p, currency, width }: { p: Product; currency: 'ZAR
 );
 
 const s = StyleSheet.create({
-  eyebrow: { fontFamily: Type.mono, fontSize: 11, letterSpacing: 1.6, textTransform: 'uppercase' },
+  eyebrow: { fontFamily: Type.bodyBold ?? Type.body, fontSize: 14, fontWeight: '700' },
   display: { fontFamily: Type.display, textTransform: 'uppercase' },
   btn: { minHeight: 52, paddingHorizontal: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
   btnText: { fontFamily: Type.monoBold, fontSize: 13, letterSpacing: 1.6, textTransform: 'uppercase' },
