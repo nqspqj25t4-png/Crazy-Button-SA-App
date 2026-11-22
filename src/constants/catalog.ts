@@ -6,7 +6,7 @@
  */
 import { ImageSourcePropType } from 'react-native';
 
-export type Category = 'Hoodies' | 'Jackets' | 'Knitwear' | 'Shirts' | 'Tees' | 'Pants' | 'Hats' | 'Bags' | 'Patches';
+export type Category = 'Hoodies' | 'Jackets' | 'Knitwear' | 'Shirts' | 'Tees' | 'Pants' | 'Caps' | 'Hats' | 'Bags' | 'Patches';
 
 export type Product = {
   id: string;
@@ -25,7 +25,7 @@ export type Product = {
 const APPAREL = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 const ONE = ['One size'];
 
-export const CATEGORIES: Category[] = ['Hoodies', 'Jackets', 'Knitwear', 'Shirts', 'Tees', 'Pants', 'Hats', 'Bags', 'Patches'];
+export const CATEGORIES: Category[] = ['Hoodies', 'Jackets', 'Knitwear', 'Shirts', 'Tees', 'Pants', 'Caps', 'Hats', 'Bags', 'Patches'];
 
 export const CATALOG: Product[] = [
   { id: 'umlazi-unit-hoodie', title: 'Umlazi Unit Hoodie', collection: 'Core Range', category: 'Hoodies', badge: 'Hero', subtitle: 'Olive fleece, gold embroidered CB', description: 'The uniform of the underground. Olive heavyweight hoodie with gold embroidered CB letters, “Umlazi Unit” stitching, flag-colour sleeve stripes and a leather cuff tab.', image: require('@/assets/images/products/hoodie.jpg'), priceZAR: 2449, priceEUR: 135, sizes: APPAREL },
@@ -44,6 +44,14 @@ export const CATALOG: Product[] = [
   { id: 'spaza-bucket', title: 'Spaza Bucket Hat', collection: 'Spaza Drip', category: 'Hats', badge: 'New', subtitle: 'Spaza shop front', description: 'Flag colour-block bucket with an embroidered spaza shop front.', image: require('@/assets/images/products/spaza.jpg'), priceZAR: 1449, priceEUR: 80, sizes: ONE },
   { id: 'kwa-mashu-daylife-bucket', title: 'Kwa Mashu Daylife Bucket Hat', collection: 'Core Range', category: 'Hats', subtitle: 'Rise & grind kasi style', description: 'Gold and green bucket with the Kwa Mashu Daylife patch.', image: require('@/assets/images/products/daylife.jpg'), priceZAR: 1399, priceEUR: 75, sizes: ONE },
   { id: 'umlazi-nights-bucket', title: 'Umlazi Nights Bucket Hat', collection: 'Core Range', category: 'Hats', subtitle: 'Purple and black skyline', description: 'Purple and black bucket with embroidered skyline and dancers.', image: require('@/assets/images/products/umlazihat.jpg'), priceZAR: 1449, priceEUR: 80, sizes: ONE },
+  { id: 'smoke-snapback', title: 'Smoke Snapback', collection: 'Core Range', category: 'Caps', badge: 'New', subtitle: 'Grey crown, navy brim', description: 'Flat-brim snapback in smoke grey with a navy peak and the needle-and-button crest embroidered in white.', image: require('@/assets/images/products/cap-smoke.jpg'), priceZAR: 1249, priceEUR: 70, sizes: ONE },
+  { id: 'rainbow-nation-snapback', title: 'Rainbow Nation Snapback', collection: 'Core Range', category: 'Caps', badge: 'New', subtitle: 'Navy, rainbow peak', description: 'Navy snapback with a striped rainbow peak and the white crest up front. Every colour on one brim.', image: require('@/assets/images/products/cap-rainbow.jpg'), priceZAR: 1249, priceEUR: 70, sizes: ONE },
+  { id: 'red-peak-snapback', title: 'Red Peak Snapback', collection: 'Core Range', category: 'Caps', subtitle: 'Black crown, red brim', description: 'Black snapback, flag-red flat peak, white crest. Goes with everything loud.', image: require('@/assets/images/products/cap-blackred.jpg'), priceZAR: 1249, priceEUR: 70, sizes: ONE },
+  { id: 'est-2011-snapback', title: 'Est. 2011 Snapback', collection: 'Core Range', category: 'Caps', subtitle: 'Black and olive, big crest', description: 'The full Crazy Button crest, Est. 2011, stitched big across a black crown with an olive peak.', image: require('@/assets/images/products/cap-olive.jpg'), priceZAR: 1249, priceEUR: 70, sizes: ONE },
+  { id: 'purple-gold-snapback', title: 'Purple & Gold Snapback', collection: 'Core Range', category: 'Caps', subtitle: 'Purple crown, gold brim', description: 'Purple crown, gold peak, Crazy Button wordmark. Royal for the block.', image: require('@/assets/images/products/cap-purple.jpg'), priceZAR: 1249, priceEUR: 70, sizes: ONE },
+  { id: 'mustard-beanie', title: 'Mustard Beanie', collection: 'Core Range', category: 'Hats', subtitle: 'Chunky rib, white crest', description: 'Chunky ribbed beanie in mustard with a folded cuff and the white crest.', image: require('@/assets/images/products/beanie-mustard.jpg'), priceZAR: 1099, priceEUR: 60, sizes: ONE },
+  { id: 'purple-beanie', title: 'Purple Beanie', collection: 'Core Range', category: 'Hats', subtitle: 'Chunky rib, white crest', description: 'Deep purple ribbed beanie, folded cuff, crest front and centre.', image: require('@/assets/images/products/beanie-purple.jpg'), priceZAR: 1099, priceEUR: 60, sizes: ONE },
+  { id: 'maroon-beanie', title: 'Maroon Beanie', collection: 'Core Range', category: 'Hats', subtitle: 'Chunky rib, white crest', description: 'Maroon ribbed beanie with a folded cuff and the white crest.', image: require('@/assets/images/products/beanie-maroon.jpg'), priceZAR: 1099, priceEUR: 60, sizes: ONE },
   { id: 'cbsa-drawstring', title: 'CBSA Drawstring Bag', collection: 'Core Range', category: 'Bags', subtitle: 'Umlazi · Workshop · Berea · CBD', description: 'Black drawstring bag with CBSA graffiti and a Durban street sign.', image: require('@/assets/images/products/drawstring.jpg'), priceZAR: 1249, priceEUR: 70, sizes: ONE },
   { id: 'cbsa-drawstring-range', title: 'CBSA Drawstring Range', collection: 'Core Range', category: 'Bags', subtitle: 'Camo, black and denim', description: 'The drawstring in camo, black and denim.', image: require('@/assets/images/products/drawrange.jpg'), priceZAR: 2249, priceEUR: 125, sizes: ONE },
   { id: 'luggage-black', title: 'Luggage Cover — Black', collection: 'Core Range', category: 'Bags', subtitle: 'Premium Brand button crest', description: 'Stretch suitcase cover with the Premium Brand button crest.', image: require('@/assets/images/products/lugblack.jpg'), priceZAR: 1599, priceEUR: 90, sizes: ['S', 'M', 'L'] },
