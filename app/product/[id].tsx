@@ -3,8 +3,8 @@ import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
-import { useEffect, useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Brand, Type } from '@/constants/theme';
@@ -23,6 +23,15 @@ export default function ProductScreen() {
   const [added, setAdded] = useState(false);
   const wide = width >= 900;
   const pad = wide ? 40 : 20;
+  const swing = useRef(new Animated.Value(1)).current;
+  const sway = (from: number) => {
+    swing.setValue(from);
+    Animated.spring(swing, { toValue: 0, friction: 2.6, tension: 30, useNativeDriver: Platform.OS !== 'web' }).start();
+  };
+  const tilt = swing.interpolate({ inputRange: [-1, 1], outputRange: ['-14deg', '14deg'] });
+  const hang = swing.interpolate({ inputRange: [-1, 1], outputRange: ['-2deg', '2deg'] });
+
+  useEffect(() => { sway(1); }, [p?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { if (p) trackItems('view_item', currency, [{ p }]); }, [p?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -57,7 +66,20 @@ export default function ProductScreen() {
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
         <View style={{ flexDirection: wide ? 'row' : 'column', maxWidth: 1360, width: '100%', alignSelf: 'center' }}>
           <View style={{ flex: 1, aspectRatio: 4 / 5, backgroundColor: Brand.studio }}>
-            <Image source={p.image} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+            <Animated.View style={[StyleSheet.absoluteFill, { transformOrigin: '50% 4%', transform: [{ rotate: hang }] }]}>
+              <Image source={p.image} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+              <View style={styles.stem} />
+              <View style={styles.hook} />
+            </Animated.View>
+            <View style={styles.rail} />
+            <Animated.View style={[styles.tagWrap, { transformOrigin: '50% 0%', transform: [{ rotate: tilt }] }]} accessibilityLabel={`Price ${formatPrice(p, currency)}`}>
+              <View style={styles.string} />
+              <View style={styles.hangTag}>
+                <View style={styles.hole} />
+                <Text style={styles.tagPrice}>{formatPrice(p, currency)}</Text>
+                <Text style={styles.tagSize}>{chosen ?? sizes.join(' · ')}</Text>
+              </View>
+            </Animated.View>
             <Pressable onPress={() => (router.canGoBack() ? router.back() : router.replace('/catalog'))} style={styles.back} accessibilityRole="button" accessibilityLabel="Back">
               <Feather name="arrow-left" size={20} color={Brand.ink} />
             </Pressable>
@@ -76,7 +98,7 @@ export default function ProductScreen() {
               <Eyebrow color={Brand.ink}>Size{chosen ? `: ${chosen}` : ''}</Eyebrow>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                 {sizes.map((s) => (
-                  <Pressable key={s} onPress={() => { setSize(s); setAdded(false); }} accessibilityRole="radio" accessibilityState={{ checked: chosen === s }} style={[styles.size, chosen === s && { backgroundColor: Brand.ink }]}>
+                  <Pressable key={s} onPress={() => { setSize(s); setAdded(false); sway(-0.7); }} accessibilityRole="radio" accessibilityState={{ checked: chosen === s }} style={[styles.size, chosen === s && { backgroundColor: Brand.ink }]}>
                     <Text style={[styles.sizeText, chosen === s && { color: Brand.bone }]}>{s}</Text>
                   </Pressable>
                 ))}
@@ -106,7 +128,16 @@ export default function ProductScreen() {
 }
 
 const styles = StyleSheet.create({
-  back: { position: 'absolute', top: 14, left: 14, width: 44, height: 44, borderRadius: 22, backgroundColor: Brand.bone, alignItems: 'center', justifyContent: 'center' },
+  rail: { position: 'absolute', top: 22, left: 0, right: 0, height: 12, borderRadius: 6, backgroundColor: '#C9A25A', borderTopWidth: 3, borderTopColor: '#F1DDA8', borderBottomWidth: 2, borderBottomColor: '#7E5A22', boxShadow: '0 5px 6px -2px rgba(18,18,18,.25)' },
+  hook: { position: 'absolute', top: 15, left: '50%', marginLeft: -12, width: 24, height: 24, borderRadius: 12, borderWidth: 3, borderColor: '#2F2C2A', borderBottomColor: 'transparent', borderRightColor: 'transparent', transform: [{ rotate: '45deg' }] },
+  stem: { position: 'absolute', top: 27, left: '50%', marginLeft: -1.5, width: 3, height: 44, backgroundColor: '#2F2C2A' },
+  tagWrap: { position: 'absolute', top: 30, right: '5%', alignItems: 'center' },
+  string: { width: 1.5, height: 46, backgroundColor: '#6E4F28' },
+  hangTag: { minWidth: 96, paddingTop: 20, paddingBottom: 12, paddingHorizontal: 14, backgroundColor: Brand.bone, borderWidth: 1, borderColor: 'rgba(18,18,18,.18)', borderRadius: 4, alignItems: 'center', gap: 2, boxShadow: '0 8px 14px -6px rgba(18,18,18,.35)' },
+  hole: { position: 'absolute', top: 7, width: 7, height: 7, borderRadius: 4, backgroundColor: '#C9A25A' },
+  tagPrice: { fontFamily: Type.display, fontSize: 22, color: Brand.ink },
+  tagSize: { fontFamily: Type.bodyBold ?? Type.body, fontSize: 12, color: Brand.smoke },
+  back: { position: 'absolute', top: 48, left: 14, width: 44, height: 44, borderRadius: 22, backgroundColor: Brand.bone, alignItems: 'center', justifyContent: 'center' },
   tag: { paddingHorizontal: 8, paddingVertical: 4, fontFamily: Type.mono, fontSize: 10, letterSpacing: 1.2, textTransform: 'uppercase', color: Brand.ink, overflow: 'hidden' },
   price: { fontFamily: Type.monoBold, fontSize: 20, color: Brand.ink },
   body: { fontFamily: Type.body, fontSize: 17, lineHeight: 26, color: Brand.ink },
